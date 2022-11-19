@@ -11,7 +11,12 @@ from pybricks.media.ev3dev import SoundFile, ImageFile
 
 # Create your objects here.
 ev3 = EV3Brick()
+
+left_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
+right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
+
+robot = DriveBase(left_motor, right_motor, wheel_diameter=127, axle_track=30)
+
 ev3.speaker.beep() # Sanity Check
 
-motorA = Motor(Port.A, Direction.COUNTERCLOCKWISE)
-motorA.run_time(1000, 10000)
+ev3.straight(10000)
