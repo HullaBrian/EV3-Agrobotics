@@ -8,5 +8,4 @@ Of course, this is still a work in progresss
 
 Useful links:
  - [Board layout](https://texas4-h.tamu.edu/wp-content/uploads/robotics_agrobotics_game_mat_2022_2023.pdf)
- - [EV3 Micropython documentation] (https://pybricks.com/ev3-micropython/startbrick.html)
- 
+ - [ev3 Micropython documentation](https://pybricks.com/ev3-micropython/startbrick.html)
