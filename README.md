@@ -16,10 +16,10 @@ Useful links:
 In pathfinding.py, implementing pathfinding is very simple.
 
 To get pathfinding to work:
-    1. Create a start point for the robot using a tuple
-    2. Initialize a grid using the width, height, and start point
-        - The width and height, and start are optional, but recommended
-    3. Call ```GRID.pathfind(END_POINT)``` where GRID is the Grid object and END_POINT is the end coordinates (in a tuple)
+1. Create a start point for the robot using a tuple
+2. Initialize a grid using the width, height, and start point
+    - The width and height, and start are optional, but recommended
+3. Call ```GRID.pathfind(END_POINT)``` where GRID is the Grid object and END_POINT is the end coordinates (in a tuple)
 
 Below is an example:
 ```
