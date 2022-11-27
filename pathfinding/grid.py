@@ -6,6 +6,11 @@ from queue import Queue
 from loguru import logger
 
 
+# Remove debug messages for faster execution
+logger.remove()
+logger.add(sys.stderr, level="INFO")
+
+
 class Hexagon(object):
     def __init__(self, coords: tuple, obstacle: bool = False):
         self.q = coords[0] # Coordinate corresponding to column
@@ -54,68 +59,12 @@ class Grid(object):
             (0, +1), (+1, 0), (+1, -1)
         ]
 
-        for row in self.grid:
-            for hexagon in row:
-                try:
-                    hexagon.neighbors = self.__getNeighborsOf(hexagon)
-                except AttributeError:
-                    continue
-
         # Add buffers around the ACTUAL obstacles
         for obstacle in self.obstacles:
             for neighbor in self.grid[obstacle[0]][obstacle[1]].neighbors:
                 neighbor.obstacle = True
 
         logger.success("Initialized grid!")
-    
-    def __getNeighborsOf(self, hexagon: Hexagon) -> list[str]:
-        neighbors: list[Hexagon] = []
-
-        for vector in self.axial_direction_vectors:
-            try:
-                neighbor = self.grid[hexagon.q + vector[0]][hexagon.r + vector[1]]
-                
-                if neighbor is not None:
-                    neighbors.append(neighbor)
-                    logger.debug(f"Generated neighbor for Hexagon ({hexagon.q},{hexagon.r}) -> ({neighbor.q},{neighbor.r})")
-            except AttributeError:
-                continue
-            except IndexError:
-                continue
-
-        return neighbors
-    
-    def pathfind(self, end: tuple) -> list:
-        start_hexagon = self.grid[self.start[0]][self.start[1]]
-        end_hexagon = self.grid[end[0]][end[1]]
-
-        frontier = Queue()
-        frontier.put(start_hexagon)
-        came_from = dict() # path A->B is stored as came_from[B] == A
-        came_from[start_hexagon] = None
-
-        while not frontier.empty():
-            current = frontier.get()
-
-            if (current.q, current.r) == end:
-                break 
-            
-            for next in self.__getNeighborsOf(current):
-                if next not in came_from and not next.obstacle:
-                    frontier.put(next)
-                    came_from[next] = current
-
-        path = [end_hexagon]
-        try:
-            current = came_from[end_hexagon]
-        except KeyError:
-            logger.critical(f"Could not find path from {start_hexagon} to {end_hexagon}")
-            return []
-        while current is not start_hexagon:
-            path.append(current)
-            current = came_from[current]
-
-        return path[::-1]
 
     def __str__(self):
         out: str = ""
@@ -126,15 +75,3 @@ class Grid(object):
             out += "\n"
         
         return out
-
-
-if __name__ == "__main__":
-    # Remove debug messages for faster execution
-    logger.remove()
-    logger.add(sys.stderr, level="INFO")
-    
-    logger.info("Creating grid")
-    start = (7, 4)
-    grid = Grid(start=start)
-    for node in grid.pathfind((0, 12)):
-        print(node)
