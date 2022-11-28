@@ -131,10 +131,10 @@ class Grid(object):
 if __name__ == "__main__":
     # Remove debug messages for faster execution
     logger.remove()
-    logger.add(sys.stderr, level="INFO")
+    logger.add(sys.stderr, level="DEBUG")
     
     logger.info("Creating grid")
     start = (7, 4)
     grid = Grid(start=start)
-    for node in grid.pathfind((0, 12)):
+    for node in grid.pathfind((11, 3)):
         print(node)

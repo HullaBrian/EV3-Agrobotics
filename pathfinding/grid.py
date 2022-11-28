@@ -66,6 +66,23 @@ class Grid(object):
 
         logger.success("Initialized grid!")
 
+    def hex_to_px(self, hexagon: Hexagon) -> tuple:
+        out = [0, 0]
+        out[0] = 82 * hexagon.q + 41
+
+        bottom_value = -1
+        for value in self.grid[hexagon.q][::-1]:
+            if value is not None:
+                bottom_value = value.r
+                break
+
+        if hexagon.q % 2 != 0:
+            out[1] = 70 * (bottom_value - hexagon.r) + 70
+        else:
+            out[1] = 70 * (bottom_value - hexagon.r) + 35
+
+        return tuple(out)
+
     def __str__(self):
         out: str = ""
 

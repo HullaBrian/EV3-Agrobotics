@@ -3,21 +3,34 @@ import os
 
 import pyglet
 from pyglet import image
-from pyglet.gl import *
-from grid import Grid
 
+from loguru import logger
+
+from grid import Grid
+from entities import Robot
 
 grid = Grid(start=(7, 4))
 
+window = pyglet.window.Window(width=1000, height=459, caption="Robot Pathfinding")
 
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-window = pyglet.window.Window(width=1000, height=459)
+# Get board
+image = image.load(os.path.join(pathlib.Path.cwd(), 'PAIN.png'))
 
-# print(pathlib.Path.cwd())
-image = image.load(os.path.join(pathlib.Path.cwd(), "pathfinding", 'PAIN.png'))
+# Init robot
+robot = Robot(50, 50)
+robot.set_center(grid.hex_to_px(grid.grid[1][12]))
+logger.info(f"Set robot on tile {grid.grid[1][12]}hex -> ({robot.x},{robot.y})px")
+
+"""
+Each hexagon on the 1000x459 grid is 70px tall 82px wide
+"""
 
 @window.event
 def on_draw():
     window.clear()
+
     image.blit(0, 0)
+    robot.draw()
+
+
 pyglet.app.run()
