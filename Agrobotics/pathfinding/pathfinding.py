@@ -31,7 +31,7 @@ class Grid(object):
         self.start = start
         logger.info("Initialized initial grid")
 
-        with open("obstacles.txt", "r") as file:
+        with open("../obstacles.txt", "r") as file:
             self.obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
         logger.info("Registered obstacles at: " + ", ".join(str(content) for content in self.obstacles))
 
