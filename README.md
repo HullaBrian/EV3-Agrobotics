@@ -19,12 +19,12 @@ To get pathfinding to work:
 1. Create a start point for the robot using a tuple
 2. Initialize a grid using the width, height, and start point
     - The width and height, and start are optional, but recommended
-3. Call ```GRID.pathfind(END_POINT)``` where GRID is the Grid object and END_POINT is the end coordinates (in a tuple)
+3. Call ```GRID.pathfind(END_POINT)``` where GRID is the LargeGrid object and END_POINT is the end coordinates (in a tuple)
 
 Below is an example:
 ```
 start = (7, 4)
-grid = Grid(start=start)
+grid = LargeGrid(start=start)
 for node in grid.pathfind((0, 12)):
     print(node)
 ```
