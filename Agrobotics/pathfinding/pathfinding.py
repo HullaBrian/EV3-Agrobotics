@@ -23,51 +23,26 @@ class Hexagon(object):
     def __str__(self):
         return f"({self.q},{self.r})"
 
+def convertToSmallGrid(largeCoord: tuple) -> tuple:
+        r = largeCoord[0]
+        q = largeCoord[1]
+        small_r = 35 - (4 * (r - 7)) + (2 * (q - 7)) #I don't know why these are the formulas to convert all I know is that they work
+        small_q = 35 + (2 * (r - 7)) + (2 * (q - 7))
+        return (small_r, small_q)
 
 class Grid(object):
-    def __init__(self, width: int = 14, height: int = 16, start: tuple = (7, 7)):
+    def __init__(self, width: int, height: int, start: tuple):
         # Initiating map as 2-D array with all values set to "None"
         self.grid = [[None] * width for i in range(height)]
         self.start = start
         logger.info("Initialized initial grid")
 
-        with open("../obstacles.txt", "r") as file:
-            self.obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
-        logger.info("Registered obstacles at: " + ", ".join(str(content) for content in self.obstacles))
-
-        #Defining all existing hexes
-        for q in range(16):
-            for i in range(6):
-                r = i + (8 - math.ceil(q / 2))
-
-                #Ignore hexes that are not printed on the moon base
-                if q >= 6 or q <= 8:
-                    if f"{q},{r}" in ["6,10", "7,9", "8,9"]:
-                        break
-
-                self.grid[q][r] = Hexagon((q, r), obstacle=True if (q, r) in self.obstacles else False)
-
-        logger.info("Populated grid")
 
         self.axial_direction_vectors = [
             (0, -1), (-1, 0), (-1, +1),
             (0, +1), (+1, 0), (+1, -1)
         ]
 
-        for row in self.grid:
-            for hexagon in row:
-                try:
-                    hexagon.neighbors = self.__getNeighborsOf(hexagon)
-                except AttributeError:
-                    continue
-
-        # Add buffers around the ACTUAL obstacles
-        for obstacle in self.obstacles:
-            for neighbor in self.grid[obstacle[0]][obstacle[1]].neighbors:
-                neighbor.obstacle = True
-
-        logger.success("Initialized grid!")
-    
     def __getNeighborsOf(self, hexagon: Hexagon) -> list[str]:
         neighbors: list[Hexagon] = []
 
@@ -88,6 +63,8 @@ class Grid(object):
     def pathfind(self, end: tuple) -> list:
         start_hexagon = self.grid[self.start[0]][self.start[1]]
         end_hexagon = self.grid[end[0]][end[1]]
+
+        #TODO: Implement weighting for pathfinding and allow for travel along vectors (-1,-1), (-2, +1), (-1, +2), (+1, +1), (+2, -1), and (+1, -2)
 
         frontier = Queue()
         frontier.put(start_hexagon)
@@ -126,6 +103,75 @@ class Grid(object):
             out += "\n"
         
         return out
+    
+class LargeGrid(Grid):
+    def __init__(self, width: int = 14, height: int = 16, start: tuple = (7,7)):
+        super().__init__(width, height, start)
+
+        with open("../obstacles.txt", "r") as file:
+            self.obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
+        logger.info("Registered obstacles at: " + ", ".join(str(content) for content in self.obstacles))
+
+        #Defining all existing hexes
+        for q in range(16):
+            for i in range(6):
+                r = i + (8 - math.ceil(q / 2))
+
+                #Ignore hexes that are not printed on the moon base
+                if q >= 6 or q <= 8:
+                    if f"{q},{r}" in ["6,10", "7,9", "8,9"]:
+                        break
+                
+                #Set as obstacle if in obstacles list
+                self.grid[q][r] = Hexagon((q, r), obstacle=True if (q, r) in self.obstacles else False)
+        
+        logger.info("Populated Grid")
+
+        for row in self.grid:
+            for hexagon in row:
+                try:
+                    hexagon.neighbors = self.__getNeighborsOf(hexagon)
+                except AttributeError:
+                    continue
+
+        # Add buffers around the ACTUAL obstacles
+        for obstacle in self.obstacles:
+            for neighbor in self.grid[obstacle[0]][obstacle[1]].neighbors:
+                neighbor.obstacle = True
+
+        logger.success("Initialized large grid!")
+
+class SmallGrid(Grid):
+    def __init__(self, width: int = 65, height: int = 68, start: tuple = (35, 35)):
+        super().__init__(width, height, start)
+
+
+        self.obstacles: list[tuple] = []
+        with open("../obstacles.txt", "r") as file: # Read Obstacles from obstacle list
+            large_obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
+
+        #Convert obstacles to correct format
+        for obstacle in large_obstacles:
+            self.obstacles.append(convertToSmallGrid(obstacle))
+
+
+        #Define Hexagons in grid using funky algebraic properties of the grid
+        for i in range(63):
+            r = i + 5
+            if(r < 54):
+                q = 55 - r
+            else:
+                q = r - 52
+            if(r < 19):
+                while(q - r < 47):
+                    self.grid[r][q] = Hexagon((r,q))
+                    q += 1
+            else:
+                while(q + r <= 82):
+                    self.grid[r][q] = Hexagon((r,q))
+                    q += 1
+
+        #TODO: Add code for small grid obstacles
 
 
 if __name__ == "__main__":
@@ -135,6 +181,7 @@ if __name__ == "__main__":
     
     logger.info("Creating grid")
     start = (7, 4)
-    grid = Grid(start=start)
+    grid = LargeGrid(start=start)
+    small_grid = SmallGrid()
     for node in grid.pathfind((11, 3)):
         print(node)
