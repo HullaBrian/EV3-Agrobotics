@@ -1,9 +1,12 @@
 # DO NOT RUN ON EV3
 # For generating the shortest path between two nodes
+
+# https://www.pythonpool.com/a-star-algorithm-python/
 import math
 import sys
 from queue import Queue
 from loguru import logger
+import os
 
 
 class Hexagon(object):
@@ -23,12 +26,14 @@ class Hexagon(object):
     def __str__(self):
         return f"({self.q},{self.r})"
 
+
 def convertToSmallGrid(largeCoord: tuple) -> tuple:
         r = largeCoord[0]
         q = largeCoord[1]
         small_r = 35 - (4 * (r - 7)) + (2 * (q - 7)) #I don't know why these are the formulas to convert all I know is that they work
         small_q = 35 + (2 * (r - 7)) + (2 * (q - 7))
         return (small_r, small_q)
+
 
 class Grid(object):
     def __init__(self, width: int, height: int, start: tuple):
@@ -37,22 +42,25 @@ class Grid(object):
         self.start = start
         logger.info("Initialized initial grid")
 
-
         self.axial_direction_vectors = [
             (0, -1), (-1, 0), (-1, +1),
             (0, +1), (+1, 0), (+1, -1)
+        ]
+        self.weighted_axial_direction_vectors = [
+            (-1, -1), (-2, +1), (-1, +2),
+            (+1, +1), (+2, -1), (+1, -2)
         ]
 
     def __getNeighborsOf(self, hexagon: Hexagon) -> list[str]:
         neighbors: list[Hexagon] = []
 
-        for vector in self.axial_direction_vectors:
+        for vector in list(self.axial_direction_vectors).extend(self.weighted_axial_direction_vectors):
             try:
                 neighbor = self.grid[hexagon.q + vector[0]][hexagon.r + vector[1]]
                 
                 if neighbor is not None:
-                    neighbors.append(neighbor)
-                    logger.debug(f"Generated neighbor for Hexagon ({hexagon.q},{hexagon.r}) -> ({neighbor.q},{neighbor.r})")
+                    neighbors.append((neighbor, 3 if vector in self.weighted_axial_direction_vectors else 2))
+                    logger.debug(f"Generated neighbor for Hexagon ({hexagon.q},{hexagon.r}) -> ({neighbor.q},{neighbor.r}) with weight {3 if vector in self.weighted_axial_direction_vectors else 2}")
             except AttributeError:
                 continue
             except IndexError:
@@ -103,12 +111,16 @@ class Grid(object):
             out += "\n"
         
         return out
-    
+
+
 class LargeGrid(Grid):
+    """
+    LargeGrid is solely for inputting data
+    """
     def __init__(self, width: int = 14, height: int = 16, start: tuple = (7,7)):
         super().__init__(width, height, start)
 
-        with open("../obstacles.txt", "r") as file:
+        with open(os.path.join(f"{os.sep}".join(os.path.abspath("pathfinding.py").split(os.sep)[:-1]), "Agrobotics", "obstacles.txt"), "r") as file:
             self.obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
         logger.info("Registered obstacles at: " + ", ".join(str(content) for content in self.obstacles))
 
@@ -121,7 +133,7 @@ class LargeGrid(Grid):
                 if q >= 6 or q <= 8:
                     if f"{q},{r}" in ["6,10", "7,9", "8,9"]:
                         break
-                
+
                 #Set as obstacle if in obstacles list
                 self.grid[q][r] = Hexagon((q, r), obstacle=True if (q, r) in self.obstacles else False)
         
@@ -141,19 +153,21 @@ class LargeGrid(Grid):
 
         logger.success("Initialized large grid!")
 
+
 class SmallGrid(Grid):
+    """
+    SmallGrid is used for pathfinding
+    """
     def __init__(self, width: int = 65, height: int = 68, start: tuple = (35, 35)):
         super().__init__(width, height, start)
 
-
         self.obstacles: list[tuple] = []
-        with open("../obstacles.txt", "r") as file: # Read Obstacles from obstacle list
+        with open(os.path.join(f"{os.sep}".join(os.path.abspath("pathfinding.py").split(os.sep)[:-1]), "Agrobotics", "obstacles.txt"), "r") as file: # Read Obstacles from obstacle list
             large_obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
 
         #Convert obstacles to correct format
         for obstacle in large_obstacles:
             self.obstacles.append(convertToSmallGrid(obstacle))
-
 
         #Define Hexagons in grid using funky algebraic properties of the grid
         for i in range(63):
@@ -183,5 +197,6 @@ if __name__ == "__main__":
     start = (7, 4)
     grid = LargeGrid(start=start)
     small_grid = SmallGrid()
-    for node in grid.pathfind((11, 3)):
-        print(node)
+    
+    #for node in grid.pathfind((11, 3)):
+    #    print(node)
