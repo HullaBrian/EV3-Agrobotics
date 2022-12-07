@@ -32,14 +32,14 @@ class Hexagon(object):
 def convertToSmallGrid(largeCoord: tuple) -> tuple:
         r = largeCoord[0]
         q = largeCoord[1]
-        small_r = 35 - (4 * (r - 7)) + (2 * (q - 7)) #I don't know why these are the formulas to convert all I know is that they work
-        small_q = 35 + (2 * (r - 7)) + (2 * (q - 7))
+        small_r = 35 + (4 * (r - 7)) + (2 * (q - 7)) #I don't know why these are the formulas to convert all I know is that they work
+        small_q = 35 - (2 * (r - 7)) + (2 * (q - 7))
         return (small_r, small_q)
 
 def findObstaclesFile() -> str:
     global obstaclesFile
     if obstaclesFile == "":
-        for root, dirs, files in os.walk(os.getcwd()):
+        for root, dirs, files in os.walk(os.getcwd(), topdown=False):
             for name in files:
                 if name == "obstacles.txt":
                     filePath = os.path.abspath(os.path.join(root, name))
@@ -50,7 +50,22 @@ def findObstaclesFile() -> str:
         logger.error("Obstacles file not found")
         raise Exception("Obstacles file not found")
     return obstaclesFile
-    
+
+
+def getObstacles() -> list[tuple]:
+    obstacles = []
+
+    with open(findObstaclesFile(), "r") as file:
+        line = file.readline().removesuffix("\n") # Stores the first line for upcoming while loop
+        while line != "":
+            coord = line.split(",") # stores all coords as lists of strings e.g. ["1", "8"]
+            for i in range(len(coord)): coord[i] = int(coord[i]) # converts all strings in coord to ints
+            coord = tuple(coord) # converts the list coord into a tuple
+
+            obstacles.append(coord) # adds current coord to obstacles
+            line = file.readline().removesuffix("\n") # iterates on to next line to repeat while loop
+
+    return obstacles
 
 class Grid(object):
     def __init__(self, width: int, height: int, start: tuple):
@@ -137,8 +152,7 @@ class LargeGrid(Grid):
     def __init__(self, width: int = 14, height: int = 16, start: tuple = (7,7)):
         super().__init__(width, height, start)
 
-        with open(findObstaclesFile(), "r") as file:
-            self.obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
+        self.obstacles = getObstacles()
         logger.info("Registered obstacles at: " + ", ".join(str(content) for content in self.obstacles))
 
         #Defining all existing hexes
@@ -178,13 +192,15 @@ class SmallGrid(Grid):
     def __init__(self, width: int = 65, height: int = 68, start: tuple = (35, 35)):
         super().__init__(width, height, start)
 
+        large_obstacles: list[tuple] = getObstacles()
+        
         self.obstacles: list[tuple] = []
-        with open(findObstaclesFile(), "r") as file: # Read Obstacles from obstacle list
-            large_obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
 
         #Convert obstacles to correct format
         for obstacle in large_obstacles:
             self.obstacles.append(convertToSmallGrid(obstacle))
+        
+        logger.info("Registered small obstacles at: " + ", ".join(str(content) for content in self.obstacles))
 
         #Define Hexagons in grid using funky algebraic properties of the grid
         for i in range(63):
@@ -209,7 +225,6 @@ if __name__ == "__main__":
     # Remove debug messages for faster execution
     logger.remove()
     logger.add(sys.stderr, level="INFO")
-    
     logger.info("Creating grid")
     start = (7, 4)
     grid = LargeGrid(start=start)
