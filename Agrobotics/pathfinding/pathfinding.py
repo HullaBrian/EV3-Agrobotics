@@ -8,6 +8,8 @@ from queue import Queue
 from loguru import logger
 import os
 
+obstaclesFile: str = ""
+
 
 class Hexagon(object):
     def __init__(self, coords: tuple, obstacle: bool = False):
@@ -34,6 +36,21 @@ def convertToSmallGrid(largeCoord: tuple) -> tuple:
         small_q = 35 + (2 * (r - 7)) + (2 * (q - 7))
         return (small_r, small_q)
 
+def findObstaclesFile() -> str:
+    global obstaclesFile
+    if obstaclesFile == "":
+        for root, dirs, files in os.walk(os.getcwd()):
+            for name in files:
+                if name == "obstacles.txt":
+                    filePath = os.path.abspath(os.path.join(root, name))
+                    obstaclesFile = filePath
+                    logger.success("Obstacles file found at path " + filePath)
+                    break
+    if obstaclesFile == "":
+        logger.error("Obstacles file not found")
+        raise Exception("Obstacles file not found")
+    return obstaclesFile
+    
 
 class Grid(object):
     def __init__(self, width: int, height: int, start: tuple):
@@ -120,7 +137,7 @@ class LargeGrid(Grid):
     def __init__(self, width: int = 14, height: int = 16, start: tuple = (7,7)):
         super().__init__(width, height, start)
 
-        with open(os.path.join(f"{os.sep}".join(os.path.abspath("pathfinding.py").split(os.sep)[:-1]), "Agrobotics", "obstacles.txt"), "r") as file:
+        with open(findObstaclesFile(), "r") as file:
             self.obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
         logger.info("Registered obstacles at: " + ", ".join(str(content) for content in self.obstacles))
 
@@ -162,7 +179,7 @@ class SmallGrid(Grid):
         super().__init__(width, height, start)
 
         self.obstacles: list[tuple] = []
-        with open(os.path.join(f"{os.sep}".join(os.path.abspath("pathfinding.py").split(os.sep)[:-1]), "Agrobotics", "obstacles.txt"), "r") as file: # Read Obstacles from obstacle list
+        with open(findObstaclesFile(), "r") as file: # Read Obstacles from obstacle list
             large_obstacles = [tuple([int(coord.removesuffix("\n")) for coord in line.split(",")]) for line in file.readlines()]
 
         #Convert obstacles to correct format
@@ -191,7 +208,7 @@ class SmallGrid(Grid):
 if __name__ == "__main__":
     # Remove debug messages for faster execution
     logger.remove()
-    logger.add(sys.stderr, level="DEBUG")
+    logger.add(sys.stderr, level="INFO")
     
     logger.info("Creating grid")
     start = (7, 4)
