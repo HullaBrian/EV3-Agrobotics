@@ -67,6 +67,20 @@ def getObstacles() -> list[tuple]:
 
     return obstacles
 
+def hexDistTo(start: tuple, end: tuple) -> int:
+    '''Takes two hex coordinates and returns the linear distance between the two in terms of radii (Not Yet Implemented)'''
+    # https://www.redblobgames.com/grids/hexagons/#line-drawing
+
+    start_r = start[0]
+    start_q = start[1]
+    start_s = -1 * (start_r + start_q)
+
+    end_r = end[0]
+    end_q = end[1]
+    end_s = -1 * (end_r + end_q)
+    
+    return 0
+
 class Grid(object):
     def __init__(self, width: int, height: int, start: tuple):
         # Initiating map as 2-D array with all values set to "None"
