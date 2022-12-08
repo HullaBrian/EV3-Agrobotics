@@ -268,15 +268,3 @@ if __name__ == "__main__":
     
     #for node in grid.pathfind((11, 3)):
     #    print(node)
-
-if __name__ == "__main__":
-    # Remove debug messages for faster execution
-    logger.remove()
-    logger.add(sys.stderr, level="INFO")
-    logger.info("Creating grid")
-    start = (7, 4)
-    grid = LargeGrid(start=start)
-    small_grid = SmallGrid()
-    
-    #for node in grid.pathfind((11, 3)):
-    #    print(node)
