@@ -9,6 +9,7 @@ from loguru import logger
 import os
 
 obstaclesFile: str = ""
+sqrt3 = math.sqrt(3)
 
 
 class Hexagon(object):
@@ -67,19 +68,39 @@ def getObstacles() -> list[tuple]:
 
     return obstacles
 
-def hexDistTo(start: tuple, end: tuple) -> int:
-    '''Takes two hex coordinates and returns the linear distance between the two in terms of radii (Not Yet Implemented)'''
-    # https://www.redblobgames.com/grids/hexagons/#line-drawing
+def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
+    r = Coord[0]
+    q = Coord[1]
 
-    start_r = start[0]
-    start_q = start[1]
-    start_s = -1 * (start_r + start_q)
+    if(isLarge):
+        x = r * 2
+        y = 26 - ((2 * q) + r)
+    else:
+        x = 46 - (q - r)
+        y = 82 - (r + q)
+        x = round(3 * sqrt3)
+        y = y * 3
 
-    end_r = end[0]
-    end_q = end[1]
-    end_s = -1 * (end_r + end_q)
-    
-    return 0
+    return (x, y) # Coordinates are in terms of half radii; x is approximated to nearest half radius
+
+
+
+def smallHexDistTo(start: tuple, end: tuple) -> int:
+    '''Takes two small hex coordinates and returns the linear distance between the two in terms of half radii to nearest half radius'''
+    #TODO: Fix diagonal paths being preferred over straight ones due to rounding apothems down to nearest half raidus
+
+    start_rect_coord = hexToRect(start, False)
+    start_x = start_rect_coord[0]
+    start_y = start_rect_coord[1]
+
+    end_rect_coord = hexToRect(end, False)
+    end_x = end_rect_coord[0]
+    end_y = end_rect_coord[1]
+
+    dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)  # Pythagorean theorum
+
+    return int(dist)
+
 
 class Grid(object):
     def __init__(self, width: int, height: int, start: tuple):
@@ -234,6 +255,18 @@ class SmallGrid(Grid):
 
         #TODO: Add code for small grid obstacles
 
+
+if __name__ == "__main__":
+    # Remove debug messages for faster execution
+    logger.remove()
+    logger.add(sys.stderr, level="INFO")
+    logger.info("Creating grid")
+    start = (7, 4)
+    grid = LargeGrid(start=start)
+    small_grid = SmallGrid()
+    
+    #for node in grid.pathfind((11, 3)):
+    #    print(node)
 
 if __name__ == "__main__":
     # Remove debug messages for faster execution
