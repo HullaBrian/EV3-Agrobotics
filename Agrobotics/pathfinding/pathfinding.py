@@ -86,7 +86,7 @@ def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
 
 
 def smallHexDistTo(start: tuple, end: tuple) -> int:
-    '''Takes two small hex coordinates and returns the linear distance between the two in terms of half radii to nearest half radius'''
+    '''Takes two small hex coordinates and returns the linear distance (squared) between the two in terms of half radii to nearest half radius'''
     #TODO: Fix diagonal paths being preferred over straight ones due to rounding apothems down to nearest half raidus
 
     start_rect_coord = hexToRect(start, False)
@@ -97,9 +97,10 @@ def smallHexDistTo(start: tuple, end: tuple) -> int:
     end_x = end_rect_coord[0]
     end_y = end_rect_coord[1]
 
-    dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)  # Pythagorean theorum
+    dist = (end_x - start_x)**2 + (end_y - start_y)**2  # Pythagorean theorum without square root
+    #Square root is unnecessary because for all non-negative values of a and b where a > b,  a*a > b*b
 
-    return int(dist)
+    return dist
 
 
 class Grid(object):
