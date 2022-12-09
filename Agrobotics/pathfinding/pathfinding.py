@@ -6,9 +6,15 @@ import math
 import sys
 import time
 from queue import Queue
+from queue import PriorityQueue
+from itertools import count
 from loguru import logger
 import os
 from threading import Thread
+
+logger.info("Program Start")
+
+unique = count()
 
 
 obstaclesFile: str = ""
@@ -119,6 +125,8 @@ class Grid(object):
         # Initiating map as 2-D array with all values set to "None"
         self.grid = [[None] * width for i in range(height)]
         self.start = start
+        self.axial_vectors_cost = 2
+        self.weighted_vectors_cost = 3
         logger.info("Initialized initial grid")
 
         self.axial_direction_vectors = [
@@ -141,15 +149,74 @@ class Grid(object):
                 neighbor = self.grid[hexagon.q + vector[0]][hexagon.r + vector[1]]
                 
                 if neighbor is not None:
-                    neighbors.append((neighbor, 3 if vector in self.weighted_axial_direction_vectors else 2))
-                    logger.debug(f"Generated neighbor for Hexagon ({hexagon.q},{hexagon.r}) -> ({neighbor.q},{neighbor.r}) with weight {3 if vector in self.weighted_axial_direction_vectors else 2}")
+                    neighbors.append(neighbor)
+                    logger.debug(f"Generated neighbor for Hexagon ({hexagon.q},{hexagon.r}) -> ({neighbor.q},{neighbor.r})")
             except AttributeError:
                 continue
             except IndexError:
                 continue
-
+        logger.debug(f"Hexagon {hexagon} has neighbors list {neighbors}")
         return neighbors
+
+
+    def moveCost(self, hex1: Hexagon, hex2: Hexagon) -> int:
+        vector = (hex2.r - hex1.r, hex2.q - hex1.q)
+        if vector in self.axial_direction_vectors:
+            return self.axial_vectors_cost
+        elif vector in self.weighted_axial_direction_vectors:
+            return self.weighted_vectors_cost
+        else:
+            logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")
+            
     
+    def newPathFind(self, start: tuple, end: tuple) -> list:
+        start_hexagon = self.grid[start[0]][start[1]]
+        end_hexagon = self.grid[end[0]][end[1]]
+
+        logger.info(f"Pathfinding from {start_hexagon} to {end_hexagon}")
+
+        frontier = PriorityQueue()
+        frontier.put((0, next(unique), start_hexagon))
+
+        logger.debug(f"Frontier contains {frontier.queue}")
+
+        came_from = {start_hexagon: None}
+        cost_so_far = {start_hexagon: 0}
+
+        while not frontier.empty():
+            current = frontier.get()
+            current = current[2]
+
+            if current == end_hexagon:
+                break
+
+            for next_hex in self.getNeighborsOf(current):
+                new_cost = cost_so_far[current] + self.moveCost(current, next_hex)
+                if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
+                    logger.debug(f"Adding hex to queue at {next_hex.r}, {next_hex.q}")
+                    cost_so_far[next_hex] = new_cost
+                    priority = new_cost + smallHexDistTo((next_hex.r, next_hex.q), (end_hexagon.r, end_hexagon.q))
+                    frontier.put((priority, next(unique), next_hex))
+                    came_from[next_hex] = current
+        else:
+            logger.error(f"No path from {start} to {end} found")
+
+        path = [current] #This list will be the shortest path between the two hexes
+
+        while current != start_hexagon:
+            current = came_from[current]
+            path.append(current)
+        
+        path.reverse()
+
+        logger.info("Shortest path found is: ")
+        for node in path:
+            logger.info(str(node))
+        
+        return path
+    
+
+    # Pathfind function is made largely obsolete by newPathfind consider removing once newPathfind is known to be fully functioning
     def pathfind(self, end: tuple) -> list:
         start_hexagon = self.grid[self.start[0]][self.start[1]]
         end_hexagon = self.grid[end[0]][end[1]]
@@ -269,6 +336,8 @@ class SmallGrid(Grid):
 
         # TODO: Add code for small grid obstacles
 
+
+        #Begin multi-threaded neighbor generation
         logger.info("Generating neighbors...")
         thread_count = 4  # There are 68 rows, leaving each thread (assuming 4) 17 rows to do
         start = time.time()
@@ -297,7 +366,7 @@ class SmallGrid(Grid):
         rows = []
         for row in map[1:]:
             rows.append(row)
-        print(rows)
+        #print(rows)
         for row in rows:
             for hexagon in row:
                 try:
@@ -314,6 +383,7 @@ if __name__ == "__main__":
     start = (7, 4)
     grid = LargeGrid(start=start)
     small_grid = SmallGrid()
+    small_grid.newPathFind((5, 50), (67, 15))
 
     """
     for row in small_grid.grid:
