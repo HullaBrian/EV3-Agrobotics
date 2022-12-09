@@ -4,9 +4,12 @@
 # https://www.pythonpool.com/a-star-algorithm-python/
 import math
 import sys
+import time
 from queue import Queue
 from loguru import logger
 import os
+from threading import Thread
+
 
 obstaclesFile: str = ""
 sqrt3 = math.sqrt(3)
@@ -14,11 +17,11 @@ sqrt3 = math.sqrt(3)
 
 class Hexagon(object):
     def __init__(self, coords: tuple, obstacle: bool = False):
-        self.q = coords[0] # Coordinate corresponding to column
-        self.r = coords[1] # Coordinate corresponding to negative diagonal
+        self.q = coords[0]  # Coordinate corresponding to column
+        self.r = coords[1]  # Coordinate corresponding to negative diagonal
 
-        #s coordinate is calculated from r and q and is used for some calculations
-        self.s = -1 * (self.r + self.q) # Coordinate corresponding to positive diagonal
+        # s coordinate is calculated from r and q and is used for some calculations
+        self.s = -1 * (self.r + self.q)  # Coordinate corresponding to positive diagonal
     
         self.neighbors = []
 
@@ -31,17 +34,21 @@ class Hexagon(object):
 
 
 def convertToSmallGrid(largeCoord: tuple) -> tuple:
-        r = largeCoord[0]
-        q = largeCoord[1]
-        small_r = 35 + (4 * (r - 7)) + (2 * (q - 7)) #I don't know why these are the formulas to convert all I know is that they work
-        small_q = 35 - (2 * (r - 7)) + (2 * (q - 7))
-        return (small_r, small_q)
+    r = largeCoord[0]
+    q = largeCoord[1]
+    small_r = 35 + (4 * (r - 7)) + (2 * (q - 7))  # I don't know why these are the formulas to convert all I know is that they work
+    small_q = 35 - (2 * (r - 7)) + (2 * (q - 7))
+
+    return (small_r, small_q)
+
 
 def findObstaclesFile() -> str:
     global obstaclesFile
     if obstaclesFile == "":
+        logger.debug(f"Current working directory is: {os.getcwd()}")
         for root, dirs, files in os.walk(os.getcwd(), topdown=False):
             for name in files:
+                logger.debug(f"ACK file '{name}'")
                 if name == "obstacles.txt":
                     filePath = os.path.abspath(os.path.join(root, name))
                     obstaclesFile = filePath
@@ -68,11 +75,12 @@ def getObstacles() -> list[tuple]:
 
     return obstacles
 
+
 def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
     r = Coord[0]
     q = Coord[1]
 
-    if(isLarge):
+    if isLarge:
         x = r * 2
         y = 26 - ((2 * q) + r)
     else:
@@ -84,10 +92,13 @@ def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
     return (x, y) # Coordinates are in terms of half radii; x is approximated to nearest half radius
 
 
-
 def smallHexDistTo(start: tuple, end: tuple) -> int:
-    '''Takes two small hex coordinates and returns the linear distance (squared) between the two in terms of half radii to nearest half radius'''
-    #TODO: Fix diagonal paths being preferred over straight ones due to rounding apothems down to nearest half raidus
+    """
+    Takes two small hex coordinates and returns the linear distance (squared) between the two in terms of half
+    radii to nearest half radius
+    """
+
+    # TODO: Fix diagonal paths being preferred over straight ones due to rounding apothems down to nearest half raidus
 
     start_rect_coord = hexToRect(start, False)
     start_x = start_rect_coord[0]
@@ -119,10 +130,13 @@ class Grid(object):
             (+1, +1), (+2, -1), (+1, -2)
         ]
 
-    def __getNeighborsOf(self, hexagon: Hexagon) -> list[str]:
-        neighbors: list[Hexagon] = []
+    def getNeighborsOf(self, hexagon: Hexagon) -> list[str]:
+        neighbors: list[tuple] = []
 
-        for vector in list(self.axial_direction_vectors).extend(self.weighted_axial_direction_vectors):
+        vectors = self.axial_direction_vectors
+        vectors.extend(self.weighted_axial_direction_vectors)
+
+        for vector in vectors:
             try:
                 neighbor = self.grid[hexagon.q + vector[0]][hexagon.r + vector[1]]
                 
@@ -144,15 +158,15 @@ class Grid(object):
 
         frontier = Queue()
         frontier.put(start_hexagon)
-        came_from = dict() # path A->B is stored as came_from[B] == A
+        came_from = dict()  # path A->B is stored as came_from[B] == A
         came_from[start_hexagon] = None
 
         while not frontier.empty():
             current = frontier.get()
 
             if (current.q, current.r) == end:
-                break 
-            
+                break
+
             for next in self.__getNeighborsOf(current):
                 if next not in came_from and not next.obstacle:
                     frontier.put(next)
@@ -229,32 +243,67 @@ class SmallGrid(Grid):
         super().__init__(width, height, start)
 
         large_obstacles: list[tuple] = getObstacles()
-        
         self.obstacles: list[tuple] = []
 
-        #Convert obstacles to correct format
+        # Convert obstacles to correct format
         for obstacle in large_obstacles:
             self.obstacles.append(convertToSmallGrid(obstacle))
         
         logger.info("Registered small obstacles at: " + ", ".join(str(content) for content in self.obstacles))
 
-        #Define Hexagons in grid using funky algebraic properties of the grid
+        # Define Hexagons in grid using funky algebraic properties of the grid
         for i in range(63):
             r = i + 5
-            if(r < 54):
+            if r < 54:
                 q = 55 - r
             else:
                 q = r - 52
-            if(r < 19):
-                while(q - r < 47):
-                    self.grid[r][q] = Hexagon((r,q))
+            if r < 19:
+                while q - r < 47:
+                    self.grid[r][q] = Hexagon((r, q))
                     q += 1
             else:
-                while(q + r <= 82):
-                    self.grid[r][q] = Hexagon((r,q))
+                while q + r <= 82:
+                    self.grid[r][q] = Hexagon((r, q))
                     q += 1
 
-        #TODO: Add code for small grid obstacles
+        # TODO: Add code for small grid obstacles
+
+        logger.info("Generating neighbors...")
+        thread_count = 4  # There are 68 rows, leaving each thread (assuming 4) 17 rows to do
+        start = time.time()
+
+        threads: list[Thread] = []
+        row_counter = 0
+        iterator = int(len(self.grid) / thread_count)
+
+        # Initialize threads
+        for _ in range(thread_count):
+            threads.append(Thread(target=self.__generate_neighbors, args=(self.grid[row_counter:row_counter + iterator])))
+            row_counter += iterator
+
+        # Start threads
+        for thread in threads:
+            thread.start()
+
+        # Wait for threads to stop
+        while True in [thread.is_alive() for thread in threads]:
+            pass
+
+        end = time.time()
+        logger.success(f"Finished generating neighbors in {(end - start)} seconds.")
+
+    def __generate_neighbors(*map: list[list]):
+        rows = []
+        for row in map[1:]:
+            rows.append(row)
+        print(rows)
+        for row in rows:
+            for hexagon in row:
+                try:
+                    hexagon.neighbors = super.getNeighborsOf(hexagon)
+                except AttributeError:
+                    continue
 
 
 if __name__ == "__main__":
@@ -265,6 +314,13 @@ if __name__ == "__main__":
     start = (7, 4)
     grid = LargeGrid(start=start)
     small_grid = SmallGrid()
-    
-    #for node in grid.pathfind((11, 3)):
-    #    print(node)
+
+    """
+    for row in small_grid.grid:
+        for hexagon in row:
+            try:
+                if hexagon.neighbors is not None and hexagon.neighbors is not []:
+                    print(f"Hexagon at {hexagon} has neighbors!")
+            except AttributeError:
+                pass
+    """

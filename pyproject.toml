@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "ev3-agrobotics"
+version = "0.0.1"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "ev3_agrobotics"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+loguru = "^0.6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
