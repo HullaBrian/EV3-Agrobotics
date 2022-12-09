@@ -89,10 +89,11 @@ def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
     if isLarge:
         x = r * 2
         y = 26 - ((2 * q) + r)
+
     else:
         x = 46 - (q - r)
         y = 82 - (r + q)
-        x = round(3 * sqrt3)
+        x = x * round(3 * sqrt3)
         y = y * 3
 
     return (x, y) # Coordinates are in terms of half radii; x is approximated to nearest half radius
@@ -116,7 +117,10 @@ def smallHexDistTo(start: tuple, end: tuple) -> int:
 
     dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)  # Pythagorean theorum
     #Square root is necessary because program breaks without it
-    return dist
+
+    return dist / 3.9 # I don't know why this functions, but it does.
+    #If instead you divide by four, the pathfinding program doesn't prioritize distance enough
+    #If instead you divide by 3.75, the pathfinding program prioritizes distance too much
 
 
 class Grid(object):
@@ -124,7 +128,7 @@ class Grid(object):
         # Initiating map as 2-D array with all values set to "None"
         self.grid = [[None] * width for i in range(height)]
         self.start = start
-        self.axial_vectors_cost = 2
+        self.axial_vectors_cost = math.sqrt(3)
         self.weighted_vectors_cost = 3
         logger.info("Initialized initial grid")
 
@@ -154,16 +158,18 @@ class Grid(object):
                 continue
             except IndexError:
                 continue
-        logger.debug(f"Hexagon {hexagon} has neighbors list {neighbors}")
         return neighbors
 
 
     def moveCost(self, hex1: Hexagon, hex2: Hexagon) -> int:
         vector = (hex2.r - hex1.r, hex2.q - hex1.q)
-        if vector in self.axial_direction_vectors:
-            return self.axial_vectors_cost
-        elif vector in self.weighted_axial_direction_vectors:
+
+        if vector in self.weighted_axial_direction_vectors:
+            logger.debug(f"Move cost between {hex1} and {hex2} is weighted and has cost {self.weighted_vectors_cost}")
             return self.weighted_vectors_cost
+        elif vector in self.axial_direction_vectors:
+            logger.debug(f"Move cost between {hex1} and {hex2} is axial and has {self.axial_vectors_cost}")
+            return self.axial_vectors_cost
         else:
             logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")
             
@@ -191,10 +197,12 @@ class Grid(object):
 
             for next_hex in self.getNeighborsOf(current):
                 new_cost = cost_so_far[current] + self.moveCost(current, next_hex)
+
                 if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
-                    logger.debug(f"Adding hex to queue at {next_hex.r}, {next_hex.q}")
+                    logger.debug(f"Adding hex to queue at {next_hex.r}, {next_hex.q} with total cost of {new_cost}")
                     cost_so_far[next_hex] = new_cost
                     priority = new_cost + smallHexDistTo((next_hex.r, next_hex.q), (end_hexagon.r, end_hexagon.q))
+                    logger.debug(f"Hex at {next_hex.r}, {next_hex.q} has a priority of {priority}")
                     frontier.put((priority, next(unique), next_hex))
                     came_from[next_hex] = current
         else:
@@ -210,56 +218,10 @@ class Grid(object):
 
         logger.info("Shortest path found is: ")
         for node in path:
-            logger.info(str(node))
+            logger.info(f'{str(node)} {cost_so_far[node]}')
         
         return path
     
-
-    # Pathfind function is made largely obsolete by newPathfind consider removing once newPathfind is known to be fully functioning
-    def pathfind(self, end: tuple) -> list:
-        start_hexagon = self.grid[self.start[0]][self.start[1]]
-        end_hexagon = self.grid[end[0]][end[1]]
-
-        #TODO: Implement weighting for pathfinding and allow for travel along vectors (-1,-1), (-2, +1), (-1, +2), (+1, +1), (+2, -1), and (+1, -2)
-
-        frontier = Queue()
-        frontier.put(start_hexagon)
-        came_from = dict()  # path A->B is stored as came_from[B] == A
-        came_from[start_hexagon] = None
-
-        while not frontier.empty():
-            current = frontier.get()
-
-            if (current.q, current.r) == end:
-                break
-
-            for next in self.__getNeighborsOf(current):
-                if next not in came_from and not next.obstacle:
-                    frontier.put(next)
-                    came_from[next] = current
-
-        path = [end_hexagon]
-        try:
-            current = came_from[end_hexagon]
-        except KeyError:
-            logger.critical(f"Could not find path from {start_hexagon} to {end_hexagon}")
-            return []
-        while current is not start_hexagon:
-            path.append(current)
-            current = came_from[current]
-
-        return path[::-1]
-
-    def __str__(self):
-        out: str = ""
-
-        for row in list(zip(*self.grid[::1])):
-            for hex in row:
-                out += str(hex) + " "
-            out += "\n"
-        
-        return out
-
 
 class LargeGrid(Grid):
     """
@@ -377,12 +339,18 @@ class SmallGrid(Grid):
 if __name__ == "__main__":
     # Remove debug messages for faster execution
     logger.remove()
-    logger.add(sys.stderr, level="INFO")
+    logger.add(sys.stderr, level="DEBUG")
     logger.info("Creating grid")
     start = (7, 4)
     grid = LargeGrid(start=start)
     small_grid = SmallGrid()
-    small_grid.newPathFind((5, 50), (67, 15))
+
+    print(small_grid.moveCost(small_grid.grid[62][20], small_grid.grid[63][18]))
+    print(small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[47][29]))
+    print(small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[46][29]))
+    print(small_grid.moveCost(small_grid.grid[5][50], small_grid.grid[7][49]))
+
+    small_grid.newPathFind((19,45), (32, 43))
 
     """
     for row in small_grid.grid:
