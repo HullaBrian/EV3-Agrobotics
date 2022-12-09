@@ -114,9 +114,8 @@ def smallHexDistTo(start: tuple, end: tuple) -> int:
     end_x = end_rect_coord[0]
     end_y = end_rect_coord[1]
 
-    dist = (end_x - start_x)**2 + (end_y - start_y)**2  # Pythagorean theorum without square root
-    #Square root is unnecessary because for all non-negative values of a and b where a > b,  a*a > b*b
-
+    dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)  # Pythagorean theorum
+    #Square root is necessary because program breaks without it
     return dist
 
 
