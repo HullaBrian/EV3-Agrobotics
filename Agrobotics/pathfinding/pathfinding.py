@@ -72,9 +72,9 @@ def getObstacles() -> list[tuple]:
     with open(findObstaclesFile(), "r") as file:
         line = file.readline().removesuffix("\n") # Stores the first line for upcoming while loop
         while line != "":
-            coord = line.split(",") # stores all coords as lists of strings e.g. ["1", "8"]
-            for i in range(len(coord)): coord[i] = int(coord[i]) # converts all strings in coord to ints
-            coord = tuple(coord) # converts the list coord into a tuple
+            coord = line.split(",")  # stores all coords as lists of strings e.g. ["1", "8"]
+            for i in range(len(coord)): coord[i] = int(coord[i])  # converts all strings in coord to ints
+            coord = tuple(coord)  # converts the list coord into a tuple
 
             obstacles.append(coord) # adds current coord to obstacles
             line = file.readline().removesuffix("\n") # iterates on to next line to repeat while loop
@@ -96,7 +96,7 @@ def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
         x = x * round(3 * sqrt3)
         y = y * 3
 
-    return (x, y) # Coordinates are in terms of half radii; x is approximated to nearest half radius
+    return (x, y)  # Coordinates are in terms of half radii; x is approximated to nearest half radius
 
 
 def smallHexDistTo(start: tuple, end: tuple) -> int:
@@ -116,11 +116,11 @@ def smallHexDistTo(start: tuple, end: tuple) -> int:
     end_y = end_rect_coord[1]
 
     dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)  # Pythagorean theorum
-    #Square root is necessary because program breaks without it
+    # Square root is necessary because program breaks without it
 
-    return dist / 3.9 # I don't know why this functions, but it does.
-    #If instead you divide by four, the pathfinding program doesn't prioritize distance enough
-    #If instead you divide by 3.75, the pathfinding program prioritizes distance too much
+    return dist / 3.9  # I don't know why this functions, but it does.
+    # If instead you divide by four, the pathfinding program doesn't prioritize distance enough
+    # If instead you divide by 3.75, the pathfinding program prioritizes distance too much
 
 
 class Grid(object):
@@ -339,18 +339,31 @@ class SmallGrid(Grid):
 if __name__ == "__main__":
     # Remove debug messages for faster execution
     logger.remove()
-    logger.add(sys.stderr, level="DEBUG")
+    logger.add(sys.stderr, level="INFO")
     logger.info("Creating grid")
     start = (7, 4)
     grid = LargeGrid(start=start)
     small_grid = SmallGrid()
 
+    """
     print(small_grid.moveCost(small_grid.grid[62][20], small_grid.grid[63][18]))
     print(small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[47][29]))
     print(small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[46][29]))
     print(small_grid.moveCost(small_grid.grid[5][50], small_grid.grid[7][49]))
+    """
+    logger.info("Running basic grid check...")
+    try:
+        assert small_grid.moveCost(small_grid.grid[62][20], small_grid.grid[63][18]) == 3
+        assert small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[47][29]) == 3
+        assert small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[46][29]) == 1.7320508075688772
+        assert small_grid.moveCost(small_grid.grid[5][50], small_grid.grid[7][49]) == 3
+    except AssertionError as error:
+        logger.critical("Grid did not pass safety checks! Printing traceback:")
+        print(error)
+        exit()
+    logger.success("Completed checks!")
 
-    small_grid.newPathFind((19,45), (32, 43))
+    small_grid.newPathFind((19, 45), (32, 43))
 
     """
     for row in small_grid.grid:
