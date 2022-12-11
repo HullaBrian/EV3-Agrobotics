@@ -12,8 +12,6 @@ from loguru import logger
 import os
 from threading import Thread
 
-logger.info("Program Start")
-
 unique = count()
 
 
@@ -101,7 +99,7 @@ def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
 
 def smallHexDistTo(start: tuple, end: tuple) -> int:
     """
-    Takes two small hex coordinates and returns the linear distance (squared) between the two in terms of half
+    Takes two small hex coordinates and returns the linear distance between the two in terms of half
     radii to nearest half radius
     """
 
@@ -118,9 +116,7 @@ def smallHexDistTo(start: tuple, end: tuple) -> int:
     dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)  # Pythagorean theorum
     # Square root is necessary because program breaks without it
 
-    return dist / 3.9  # I don't know why this functions, but it does.
-    # If instead you divide by four, the pathfinding program doesn't prioritize distance enough
-    # If instead you divide by 3.75, the pathfinding program prioritizes distance too much
+    return dist
 
 
 class Grid(object):
@@ -201,7 +197,7 @@ class Grid(object):
                 if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
                     logger.debug(f"Adding hex to queue at {next_hex.r}, {next_hex.q} with total cost of {new_cost}")
                     cost_so_far[next_hex] = new_cost
-                    priority = new_cost + smallHexDistTo((next_hex.r, next_hex.q), (end_hexagon.r, end_hexagon.q))
+                    priority = new_cost + (smallHexDistTo((next_hex.r, next_hex.q), (end_hexagon.r, end_hexagon.q)) / 3.9)
                     logger.debug(f"Hex at {next_hex.r}, {next_hex.q} has a priority of {priority}")
                     frontier.put((priority, next(unique), next_hex))
                     came_from[next_hex] = current
@@ -338,19 +334,15 @@ class SmallGrid(Grid):
 
 if __name__ == "__main__":
     # Remove debug messages for faster execution
+    start_time = time.time()
     logger.remove()
     logger.add(sys.stderr, level="INFO")
+    logger.info("Program start")
     logger.info("Creating grid")
     start = (7, 4)
     grid = LargeGrid(start=start)
     small_grid = SmallGrid()
 
-    """
-    print(small_grid.moveCost(small_grid.grid[62][20], small_grid.grid[63][18]))
-    print(small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[47][29]))
-    print(small_grid.moveCost(small_grid.grid[45][30], small_grid.grid[46][29]))
-    print(small_grid.moveCost(small_grid.grid[5][50], small_grid.grid[7][49]))
-    """
     logger.info("Running basic grid check...")
     try:
         assert small_grid.moveCost(small_grid.grid[62][20], small_grid.grid[63][18]) == 3
@@ -364,6 +356,8 @@ if __name__ == "__main__":
     logger.success("Completed checks!")
 
     small_grid.newPathFind((19, 45), (32, 43))
+    end_time = time.time()
+    logger.success(f"Program finished in {end_time - start_time} seconds")
 
     """
     for row in small_grid.grid:
