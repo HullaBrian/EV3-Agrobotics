@@ -90,3 +90,25 @@ def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
         y = y * 3
 
     return (x, y)  # Coordinates are in terms of half radii; x is approximated to nearest half radius
+
+
+def smallHexDistTo(start: tuple, end: tuple) -> int:
+    """
+    Takes two small hex coordinates and returns the linear distance between the two in terms of half
+    radii to nearest half radius
+    """
+
+    # TODO: Fix diagonal paths being preferred over straight ones due to rounding apothems down to nearest half raidus
+
+    start_rect_coord = hexToRect(start, False)
+    start_x = start_rect_coord[0]
+    start_y = start_rect_coord[1]
+
+    end_rect_coord = hexToRect(end, False)
+    end_x = end_rect_coord[0]
+    end_y = end_rect_coord[1]
+
+    dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)  # Pythagorean theorem
+    # Square root is necessary because program breaks without it
+
+    return dist
