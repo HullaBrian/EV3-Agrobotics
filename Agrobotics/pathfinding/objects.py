@@ -1,7 +1,11 @@
-# Objects module
+# Objects module that contains helper objects and methods
+
+# Builtin modules
 import math
 import os
+from dataclasses import dataclass
 
+# 3rd party modules
 from loguru import logger
 
 
@@ -21,6 +25,14 @@ class Hexagon(object):
 
     def __str__(self):
         return f"({self.q},{self.r})"
+
+
+@dataclass
+class movement_node:
+    move_node: Hexagon  # Hexagon to move to
+    start_node: Hexagon  # Hexagon moved from
+    angle: int  # Angle to move at
+    distance: int  # Distance to move
 
 
 """
@@ -112,3 +124,27 @@ def smallHexDistTo(start: tuple, end: tuple) -> int:
     # Square root is necessary because program breaks without it
 
     return dist
+
+
+def moveCost(hex1: Hexagon, hex2: Hexagon) -> int:
+    axial_direction_vectors = [
+        (0, -1), (-1, 0), (-1, +1),
+        (0, +1), (+1, 0), (+1, -1)
+    ]
+    weighted_axial_direction_vectors = [
+        (-1, -1), (-2, +1), (-1, +2),
+        (+1, +1), (+2, -1), (+1, -2)
+    ]
+    axial_vectors_cost = sqrt3
+    weighted_vectors_cost = 3
+
+    vector = (hex2.r - hex1.r, hex2.q - hex1.q)
+
+    if vector in weighted_axial_direction_vectors:
+        logger.debug(f"Move cost between {hex1} and {hex2} is weighted and has cost {weighted_vectors_cost}")
+        return weighted_vectors_cost
+    elif vector in axial_direction_vectors:
+        logger.debug(f"Move cost between {hex1} and {hex2} is axial and has {axial_vectors_cost}")
+        return axial_vectors_cost
+    else:
+        logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")

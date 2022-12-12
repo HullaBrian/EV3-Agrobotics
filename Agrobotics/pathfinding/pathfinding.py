@@ -71,7 +71,7 @@ class Grid(object):
         else:
             logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")
 
-    def newPathFind(self, start: tuple, end: tuple) -> list:
+    def pathFind(self, start: tuple, end: tuple) -> list[Hexagon]:
         start_hexagon = self.grid[start[0]][start[1]]
         end_hexagon = self.grid[end[0]][end[1]]
 
@@ -109,7 +109,7 @@ class Grid(object):
         else:
             logger.error(f"No path from {start} to {end} found")
 
-        path = [current]  # This list will be the shortest path between the two hexes
+        path: list[Hexagon] = [current]  # This list will be the shortest path between the two hexes
 
         while current != start_hexagon:
             current = came_from[current]
@@ -275,9 +275,7 @@ if __name__ == "__main__":
         exit()
     logger.success("Completed checks!")
 
-    small_grid.newPathFind((19, 45), (32, 43))
-    for neighbor in small_grid.grid[19][45].neighbors:
-        print(neighbor)
+    small_grid.pathFind((19, 45), (32, 43))
 
     end_time = time.time()
     logger.success(f"Program finished in {end_time - start_time} seconds")
