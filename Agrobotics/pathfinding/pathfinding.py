@@ -1,100 +1,24 @@
 # DO NOT RUN ON EV3
 # For generating the shortest path between two nodes
 
-# https://www.pythonpool.com/a-star-algorithm-python/
+# Builtin modules
 import math
 import sys
 import time
-from queue import Queue
 from queue import PriorityQueue
 from itertools import count
-from loguru import logger
-import os
 from threading import Thread
 
+# 3rd party modules
+from loguru import logger
+
+# Internal modules
+from objects import Hexagon
+from objects import hexToRect
+from objects import getObstacles
+from objects import convertToSmallGrid
+
 unique = count()
-
-
-obstaclesFile: str = ""
-sqrt3 = math.sqrt(3)
-
-
-class Hexagon(object):
-    def __init__(self, coords: tuple, obstacle: bool = False):
-        self.q = coords[0]  # Coordinate corresponding to column
-        self.r = coords[1]  # Coordinate corresponding to negative diagonal
-
-        # s coordinate is calculated from r and q and is used for some calculations
-        self.s = -1 * (self.r + self.q)  # Coordinate corresponding to positive diagonal
-    
-        self.neighbors = []
-
-        self.obstacle: bool = obstacle
-
-        logger.debug(f"Created new Hexagon at ({self.q},{self.r})")
-
-    def __str__(self):
-        return f"({self.q},{self.r})"
-
-
-def convertToSmallGrid(largeCoord: tuple) -> tuple:
-    r = largeCoord[0]
-    q = largeCoord[1]
-    small_r = 35 + (4 * (r - 7)) + (2 * (q - 7))  # I don't know why these are the formulas to convert all I know is that they work
-    small_q = 35 - (2 * (r - 7)) + (2 * (q - 7))
-
-    return (small_r, small_q)
-
-
-def findObstaclesFile() -> str:
-    global obstaclesFile
-    if obstaclesFile == "":
-        logger.debug(f"Current working directory is: {os.getcwd()}")
-        for root, dirs, files in os.walk(os.getcwd(), topdown=False):
-            for name in files:
-                logger.debug(f"ACK file '{name}'")
-                if name == "obstacles.txt":
-                    filePath = os.path.abspath(os.path.join(root, name))
-                    obstaclesFile = filePath
-                    logger.success("Obstacles file found at path " + filePath)
-                    break
-    if obstaclesFile == "":
-        logger.error("Obstacles file not found")
-        raise Exception("Obstacles file not found")
-    return obstaclesFile
-
-
-def getObstacles() -> list[tuple]:
-    obstacles = []
-
-    with open(findObstaclesFile(), "r") as file:
-        line = file.readline().removesuffix("\n") # Stores the first line for upcoming while loop
-        while line != "":
-            coord = line.split(",")  # stores all coords as lists of strings e.g. ["1", "8"]
-            for i in range(len(coord)): coord[i] = int(coord[i])  # converts all strings in coord to ints
-            coord = tuple(coord)  # converts the list coord into a tuple
-
-            obstacles.append(coord) # adds current coord to obstacles
-            line = file.readline().removesuffix("\n") # iterates on to next line to repeat while loop
-
-    return obstacles
-
-
-def hexToRect(Coord: tuple, isLarge: bool = False) -> tuple:
-    r = Coord[0]
-    q = Coord[1]
-
-    if isLarge:
-        x = r * 2
-        y = 26 - ((2 * q) + r)
-
-    else:
-        x = 46 - (q - r)
-        y = 82 - (r + q)
-        x = x * round(3 * sqrt3)
-        y = y * 3
-
-    return (x, y)  # Coordinates are in terms of half radii; x is approximated to nearest half radius
 
 
 def smallHexDistTo(start: tuple, end: tuple) -> int:
@@ -146,7 +70,7 @@ class Grid(object):
         for vector in self.vectors:
             try:
                 neighbor = self.grid[hexagon.q + vector[0]][hexagon.r + vector[1]]
-                
+
                 if neighbor is not None:
                     neighbors.append(neighbor)
                     # logger.debug(f"Generated neighbor for Hexagon ({hexagon.q},{hexagon.r}) -> ({neighbor.q},{neighbor.r})")
@@ -220,7 +144,7 @@ class Grid(object):
             logger.info(f'{str(node)} {cost_so_far[node]}')
         
         return path
-    
+
 
 class LargeGrid(Grid):
     """
@@ -374,7 +298,8 @@ if __name__ == "__main__":
     logger.success("Completed checks!")
 
     small_grid.newPathFind((19, 45), (32, 43))
-    print(small_grid.obstacles)
+    for neighbor in small_grid.grid[19][45].neighbors:
+        print(neighbor)
 
     end_time = time.time()
     logger.success(f"Program finished in {end_time - start_time} seconds")
