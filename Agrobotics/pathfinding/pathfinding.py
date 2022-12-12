@@ -141,7 +141,6 @@ class Grid(object):
         self.vectors.extend(self.weighted_axial_direction_vectors)
 
     def getNeighborsOf(self, hexagon: Hexagon) -> list[str]:
-        logger.debug(f"neighbors function called on hexagon {str(hexagon)}")
         neighbors: list[tuple] = []
 
         for vector in self.vectors:
@@ -191,10 +190,14 @@ class Grid(object):
             if current == end_hexagon:
                 break
 
-            for next_hex in self.getNeighborsOf(current):
+            for next_hex in current.neighbors:
                 new_cost = cost_so_far[current] + self.moveCost(current, next_hex)
 
-                if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex] and not next_hex.obstacle:
+                if next_hex.obstacle:
+                    logger.debug(f"Avoided obstacle at {str(next_hex)}")
+                    continue
+
+                if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
                     logger.debug(f"Adding hex to queue at {next_hex.r}, {next_hex.q} with total cost of {new_cost}")
                     cost_so_far[next_hex] = new_cost
                     priority = new_cost + (smallHexDistTo((next_hex.r, next_hex.q), (end_hexagon.r, end_hexagon.q)) / 3.9)
@@ -319,19 +322,17 @@ class SmallGrid(Grid):
         for obstacle in large_obstacles:
             self.obstacles.append(convertToSmallGrid(obstacle))
 
+        self.obstacle_vectors = [
+            (-1, 0), (0, -1), (+1, -1), (+1, 0), (0, +1), (-1, -1),  # Inner neighbors
+            (-1, -1), (0, -2), (+1, -2), (+2, -2), (+2, -1), (+2, 0), (+1, +1), (0, +2), (-1, +2), (-2, +2), (-2, -1), (-2, -2)  # Outer neighbors
+        ]
         for obstacle in self.obstacles:
-            obstacle = self.grid[obstacle[0]][obstacle[1]]
+            hexagon = self.grid[obstacle[0]][obstacle[1]]
 
-            try:
-                obstacle.obstacle = True
-            except AttributeError:
-                continue
-
-            for neighbor in obstacle.neighbors:
+            hexagon.obstacle = True
+            for vector in self.obstacle_vectors:
                 try:
-                    neighbor.obstacle = True
-                    for second_neighbor in neighbor.neighbors:
-                        second_neighbor.obstacle = True
+                    self.grid[obstacle[0] + vector[0]][obstacle[1] + vector[1]].obstacle = True
                 except AttributeError:
                     continue
 
@@ -373,6 +374,7 @@ if __name__ == "__main__":
     logger.success("Completed checks!")
 
     small_grid.newPathFind((19, 45), (32, 43))
+    print(small_grid.obstacles)
 
     end_time = time.time()
     logger.success(f"Program finished in {end_time - start_time} seconds")
