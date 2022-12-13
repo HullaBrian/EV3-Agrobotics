@@ -13,13 +13,13 @@ from threading import Thread
 from loguru import logger
 
 # Internal modules
-from Agrobotics.pathfinding.objects import Hexagon
-from Agrobotics.pathfinding.objects import getObstacles
-from Agrobotics.pathfinding.objects import convertToSmallGrid
-from Agrobotics.pathfinding.objects import smallHexDistTo
-from Agrobotics.pathfinding.objects import movement_node
+from pathfinding.objects import Hexagon
+from pathfinding.objects import getObstacles
+from pathfinding.objects import convertToSmallGrid
+from pathfinding.objects import smallHexDistTo
+from pathfinding.objects import movement_node
 
-from Agrobotics.pathfinding.directional_movement import convert_to_directional_path
+from pathfinding.directional_movement import convert_to_directional_path
 
 unique = count()
 

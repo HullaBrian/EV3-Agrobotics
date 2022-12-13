@@ -1,8 +1,8 @@
 from loguru import logger
 import os
 
-from Agrobotics.pathfinding.directional_movement import convert_to_directional_path
-from Agrobotics.pathfinding.pathfinding import SmallGrid
+from pathfinding.directional_movement import convert_to_directional_path
+from pathfinding.pathfinding import SmallGrid
 
 
 grid = SmallGrid()
@@ -52,4 +52,4 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
             move_angle = movement.angle
         file.write(f"robot.turn({move_angle})\n")
 
-        file.write(f"robot.straight({movement.distance})\n")
+        file.write(f"robot.straight({round(movement.distance * 23.5)})\n")

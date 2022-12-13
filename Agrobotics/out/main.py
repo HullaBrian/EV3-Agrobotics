@@ -18,31 +18,31 @@ forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 
 robot.turn(0)
-robot.straight(1.7320508075688772)
+robot.straight(41)
 
 robot.turn(-30)
-robot.straight(3)
+robot.straight(70)
 
 robot.turn(30)
-robot.straight(1.7320508075688772)
+robot.straight(41)
 
 robot.turn(0)
-robot.straight(1.7320508075688772)
+robot.straight(41)
 
 robot.turn(0)
-robot.straight(1.7320508075688772)
+robot.straight(41)
 
 robot.turn(30)
-robot.straight(3)
+robot.straight(70)
 
 robot.turn(0)
-robot.straight(3)
+robot.straight(70)
 
 robot.turn(0)
-robot.straight(3)
+robot.straight(70)
 
 robot.turn(-30)
-robot.straight(1.7320508075688772)
+robot.straight(41)
 
 robot.turn(0)
-robot.straight(1.7320508075688772)
+robot.straight(41)
