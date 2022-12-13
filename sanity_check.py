@@ -25,7 +25,7 @@ ev3.speaker.beep() # Sanity Check
 # Measurements are innacurate
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 
-ev3.speaker.beep() # Sanity Check
+ev3.speaker.beep()  # Sanity Check
 
 robot.straight(100)
 robot.turn(90)

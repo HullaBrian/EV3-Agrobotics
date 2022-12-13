@@ -13,10 +13,13 @@ from threading import Thread
 from loguru import logger
 
 # Internal modules
-from objects import Hexagon
-from objects import getObstacles
-from objects import convertToSmallGrid
-from objects import smallHexDistTo
+from Agrobotics.pathfinding.objects import Hexagon
+from Agrobotics.pathfinding.objects import getObstacles
+from Agrobotics.pathfinding.objects import convertToSmallGrid
+from Agrobotics.pathfinding.objects import smallHexDistTo
+from Agrobotics.pathfinding.objects import movement_node
+
+from Agrobotics.pathfinding.directional_movement import convert_to_directional_path
 
 unique = count()
 
@@ -71,7 +74,7 @@ class Grid(object):
         else:
             logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")
 
-    def pathFind(self, start: tuple, end: tuple) -> list[Hexagon]:
+    def pathFind(self, start: tuple, end: tuple) -> list[movement_node]:
         start_hexagon = self.grid[start[0]][start[1]]
         end_hexagon = self.grid[end[0]][end[1]]
 
@@ -121,7 +124,7 @@ class Grid(object):
         for node in path:
             logger.info(f'{str(node)} {cost_so_far[node]}')
         
-        return path
+        return convert_to_directional_path(path)
 
 
 class LargeGrid(Grid):

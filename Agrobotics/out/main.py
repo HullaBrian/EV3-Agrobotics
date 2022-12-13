@@ -14,9 +14,35 @@ ev3 = EV3Brick()
 
 left_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
 right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
+forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
+robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 
-robot = DriveBase(left_motor, right_motor, wheel_diameter=127, axle_track=30)
+robot.turn(0)
+robot.straight(1.7320508075688772)
 
-ev3.speaker.beep() # Sanity Check
+robot.turn(-30)
+robot.straight(3)
 
-ev3.straight(10000)
+robot.turn(30)
+robot.straight(1.7320508075688772)
+
+robot.turn(0)
+robot.straight(1.7320508075688772)
+
+robot.turn(0)
+robot.straight(1.7320508075688772)
+
+robot.turn(30)
+robot.straight(3)
+
+robot.turn(0)
+robot.straight(3)
+
+robot.turn(0)
+robot.straight(3)
+
+robot.turn(-30)
+robot.straight(1.7320508075688772)
+
+robot.turn(0)
+robot.straight(1.7320508075688772)
