@@ -1,8 +1,8 @@
 from loguru import logger
 import os
 
-from pathfinding.directional_movement import convert_to_directional_path
-from pathfinding.pathfinding import SmallGrid
+from Agrobotics.pathfinding.directional_movement import convert_to_directional_path
+from Agrobotics.pathfinding.pathfinding import SmallGrid
 
 
 grid = SmallGrid()
