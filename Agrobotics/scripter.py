@@ -1,8 +1,14 @@
 from loguru import logger
 import os
+import sys
+
 
 from pathfinding.directional_movement import convert_to_directional_path
 from pathfinding.pathfinding import SmallGrid
+
+
+logger.remove()
+logger.add(sys.stderr, level="DEBUG")
 
 
 grid = SmallGrid()
