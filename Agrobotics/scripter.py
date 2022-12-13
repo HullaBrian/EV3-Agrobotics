@@ -37,25 +37,29 @@ from pybricks.parameters import Port, Stop, Direction, Button, Color
 from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
+import time
 
-# This program requires LEGO EV3 MicroPython v2.0 or higher.
-
-# Create your objects here.
 ev3 = EV3Brick()
 
-left_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
-right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
-forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
+left_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
+right_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
+
+forklift_vertical = Motor(Port.A, positive_direction=Direction.CLOCKWISE)  # Positive is up
+forklift_horizontal = Motor(Port.C, positive_direction=Direction.CLOCKWISE)  # Positive is out
+
+ev3.speaker.beep()
 """)
 
     for index, movement in enumerate(path):
-        file.write("\n")
+        file.write(f"\n# Moving to {str(movement.move_node)}\n")
 
         try:
             move_angle = movement.angle - path[index - 1].angle
         except IndexError:
             move_angle = movement.angle
-        file.write(f"robot.turn({move_angle})\n")
-
-        file.write(f"robot.straight({round(movement.distance * 23.5)})\n")
+        if move_angle != 0:
+            file.write(f"robot.turn({move_angle})\n")
+        file.write(f"robot.straight({-1 * round(movement.distance * 23.5)})\n")
+        if move_angle != 0:
+            file.write("time.sleep(0.5)\n")
