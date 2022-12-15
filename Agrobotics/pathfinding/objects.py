@@ -49,28 +49,26 @@ def convertToSmallGrid(largeCoord: tuple) -> tuple:
     return (small_r, small_q)
 
 
-def findObstaclesFile() -> str:
-    global obstaclesFile
-    if obstaclesFile == "":
-        logger.debug(f"Current working directory is: {os.getcwd()}")
-        for root, dirs, files in os.walk(os.getcwd(), topdown=False):
-            for name in files:
-                logger.debug(f"ACK file '{name}'")
-                if name == "obstacles.txt":
-                    filePath = os.path.abspath(os.path.join(root, name))
-                    obstaclesFile = filePath
-                    logger.success("Obstacles file found at path " + filePath)
-                    break
-    if obstaclesFile == "":
-        logger.error("Obstacles file not found")
-        raise Exception("Obstacles file not found")
-    return obstaclesFile
+def findFile(file_name: str) -> str:
+    logger.debug(f"Current working directory is: {os.getcwd()}")
+    for root, dirs, files in os.walk(os.getcwd(), topdown=False):
+        for name in files:
+            logger.debug(f"ACK file '{name}'")
+            if name == file_name:
+                filePath = os.path.abspath(os.path.join(root, name))
+                file = filePath
+                logger.success(f"{file_name} found at path " + filePath)
+                break
+    if file == "":
+        logger.error(f"{file_name} not found")
+        raise Exception("File not found")
+    return file
 
 
 def getObstacles() -> list[tuple]:
     obstacles = []
 
-    with open(findObstaclesFile(), "r") as file:
+    with open(findFile("obstacles.txt"), "r") as file:
         line = file.readline().removesuffix("\n") # Stores the first line for upcoming while loop
         while line != "":
             coord = line.split(",")  # stores all coords as lists of strings e.g. ["1", "8"]
