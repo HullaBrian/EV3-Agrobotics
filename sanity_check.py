@@ -17,7 +17,8 @@ ev3.speaker.beep() # Sanity Check
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.D)
 
-forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
+forklift_vertical = Motor(Port.A, positive_direction=Direction.CLOCKWISE)  # Positive is up
+forklift_horizontal = Motor(Port.C, positive_direction=Direction.CLOCKWISE)  # Positive is out
 
 time.sleep(1.0)
 ev3.speaker.beep() # Sanity Check
@@ -33,6 +34,8 @@ robot.turn(90)
 time.sleep(2.0)
 ev3.speaker.beep()
 time.sleep(2.0)
-forklift.run_time(-1000, 1000)
+forklift_verrtical.run_time(1000, 1000)
 time.sleep(2.0)
-ev3.speaker.beep()
+forklift_horizontal.run_time(-1000, 1000)
+time.sleep(0.5)
+forklift_horizontal.run_time(1000, 1000)
