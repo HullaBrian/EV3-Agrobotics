@@ -17,32 +17,96 @@ right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
 forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 
-robot.turn(0)
-robot.straight(41)
+robot.turn(60)
+robot.straight(70)
 
-robot.turn(-30)
 robot.straight(70)
 
 robot.turn(30)
 robot.straight(41)
 
-robot.turn(0)
 robot.straight(41)
 
-robot.turn(0)
+robot.straight(41)
+
+robot.straight(41)
+
+robot.straight(41)
+
+robot.straight(41)
+
+robot.straight(41)
+
+robot.turn(-150)
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.turn(30)
+robot.straight(41)
+
+robot.turn(-150)
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.turn(30)
 robot.straight(41)
 
 robot.turn(30)
 robot.straight(70)
 
-robot.turn(0)
-robot.straight(70)
-
-robot.turn(0)
-robot.straight(70)
-
-robot.turn(-30)
+robot.turn(30)
 robot.straight(41)
 
-robot.turn(0)
+robot.turn(-150)
+robot.straight(70)
+
+robot.turn(-120)
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.straight(70)
+
+robot.turn(-150)
 robot.straight(41)
+
+robot.straight(41)
+
+robot.straight(41)
+
+robot.straight(41)
+
+robot.straight(41)
+
+robot.straight(41)
+
+robot.turn(-150)
+robot.straight(70)

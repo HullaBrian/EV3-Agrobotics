@@ -18,10 +18,12 @@ from pathfinding.objects import getObstacles
 from pathfinding.objects import convertToSmallGrid
 from pathfinding.objects import smallHexDistTo
 from pathfinding.objects import movement_node
+from pathfinding.objects import vector_to
 
 from pathfinding.directional_movement import convert_to_directional_path
 
 unique = count()
+previous_vector = None
 
 
 class Grid(object):
@@ -29,8 +31,11 @@ class Grid(object):
         # Initiating map as 2-D array with all values set to "None"
         self.grid = [[None] * width for i in range(height)]
         self.start = start
+
         self.axial_vectors_cost = math.sqrt(3)
         self.weighted_vectors_cost = 3
+        self.angle_cost = 5
+
         logger.info("Initialized initial grid")
 
         self.axial_direction_vectors = [
@@ -75,6 +80,8 @@ class Grid(object):
             logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")
 
     def pathFind(self, start: tuple, end: tuple) -> list[movement_node]:
+        global previous_vector
+
         start_hexagon = self.grid[start[0]][start[1]]
         end_hexagon = self.grid[end[0]][end[1]]
 
@@ -105,7 +112,11 @@ class Grid(object):
                 if next_hex not in cost_so_far or new_cost < cost_so_far[next_hex]:
                     logger.debug(f"Adding hex to queue at {next_hex.r}, {next_hex.q} with total cost of {new_cost}")
                     cost_so_far[next_hex] = new_cost
+
                     priority = new_cost + (smallHexDistTo((next_hex.r, next_hex.q), (end_hexagon.r, end_hexagon.q)) / 3.9)
+                    if vector_to(came_from[current], current) != vector_to(current, next_hex):
+                        priority += self.angle_cost
+
                     logger.debug(f"Hex at {next_hex.r}, {next_hex.q} has a priority of {priority}")
                     frontier.put((priority, next(unique), next_hex))
                     came_from[next_hex] = current

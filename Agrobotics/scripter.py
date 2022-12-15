@@ -1,6 +1,7 @@
 from loguru import logger
 import os
 import sys
+import math
 
 
 from pathfinding.directional_movement import convert_to_directional_path
@@ -12,11 +13,12 @@ logger.add(sys.stderr, level="DEBUG")
 
 
 grid = SmallGrid()
-path = grid.pathFind((19, 45), (32, 43))
+path = grid.pathFind((5, 50), (67, 15))
 
 
 # Get output script path
 logger.debug(f"Current working directory is: {os.getcwd()}")
+file_path = ""
 for root, dirs, files in os.walk(os.getcwd(), topdown=False):
     for name in files:
         if name == "main.py":
@@ -56,6 +58,15 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
             move_angle = movement.angle - path[index - 1].angle
         except IndexError:
             move_angle = movement.angle
-        file.write(f"robot.turn({move_angle})\n")
+        move_angle = move_angle % 360
+        if abs(move_angle) > 180:
+            move_angle = (move_angle * -1)
+            if move_angle > 0:
+                move_angle -= 180
+            else:
+                move_angle += 180
+
+        if move_angle != 0:
+            file.write(f"robot.turn({move_angle})\n")
 
         file.write(f"robot.straight({round(movement.distance * 23.5)})\n")

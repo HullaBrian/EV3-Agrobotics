@@ -40,6 +40,13 @@ class movement_node:
 """
 
 
+def vector_to(hex1: Hexagon, hex2: Hexagon) -> tuple:
+    try:
+        return (hex2.r - hex1.r, hex2.q - hex1.q)
+    except AttributeError:
+        return (0, 0)
+
+
 def convertToSmallGrid(largeCoord: tuple) -> tuple:
     r = largeCoord[0]
     q = largeCoord[1]
