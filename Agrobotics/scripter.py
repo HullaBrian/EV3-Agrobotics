@@ -39,6 +39,7 @@ from pybricks.parameters import Port, Stop, Direction, Button, Color
 from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
+import time
 
 # This program requires LEGO EV3 MicroPython v2.0 or higher.
 
@@ -52,7 +53,7 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 """)
 
     for index, movement in enumerate(path):
-        file.write("\n")
+        file.write(f"\n# Moving to {str(movement.move_node)}\n")
 
         try:
             move_angle = movement.angle - path[index - 1].angle
@@ -67,6 +68,6 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
                 move_angle += 180
 
         if move_angle != 0:
-            file.write(f"robot.turn({move_angle})\n")
+            file.write(f"robot.turn({move_angle})\ntime.sleep(0.5)\n")
 
         file.write(f"robot.straight({round(movement.distance * 23.5)})\n")
