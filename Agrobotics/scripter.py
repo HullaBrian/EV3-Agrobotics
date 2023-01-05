@@ -2,7 +2,7 @@ from loguru import logger
 import os
 import sys
 import math
-
+from pathfinding.objects import convertToSmallGrid
 
 from pathfinding.directional_movement import convert_to_directional_path
 from pathfinding.pathfinding import SmallGrid
@@ -11,9 +11,9 @@ from pathfinding.pathfinding import SmallGrid
 logger.remove()
 logger.add(sys.stderr, level="DEBUG")
 
-
+start = convertToSmallGrid((7, 4))
 grid = SmallGrid()
-path = grid.pathFind((5, 50), (67, 15))
+path = grid.pathFind(start, (41, 41))
 
 
 # Get output script path
@@ -46,7 +46,7 @@ import time
 # Create your objects here.
 ev3 = EV3Brick()
 
-left_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
+left_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
 right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
 forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
@@ -70,4 +70,4 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
         if move_angle != 0:
             file.write(f"robot.turn({move_angle})\ntime.sleep(0.5)\n")
 
-        file.write(f"robot.straight({round(movement.distance * 23.5)})\n")
+        file.write(f"robot.straight({round(movement.distance * 23.5) * -1})\n")

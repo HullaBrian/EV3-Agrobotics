@@ -25,12 +25,15 @@ def convert_to_directional_path(path: list[Hexagon]) -> list[movement_node]:
             (+2, -1): 330
         }
 
+        current_angle = 90
         for index, start_node in enumerate(path[:-1]):
             move_to = path[index + 1]
 
             final_r = move_to.r - start_node.r
             final_q = move_to.q - start_node.q
-            angle = directional_vectors[(final_q, final_r)]
+            desired_angle = directional_vectors[(final_q, final_r)]
+            angle = 180 - (desired_angle - current_angle)
+            current_angle = desired_angle
 
             distance = moveCost(start_node, move_to)
 
