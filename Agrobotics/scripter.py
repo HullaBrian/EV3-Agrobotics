@@ -52,22 +52,19 @@ forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 """)
 
+    straight_accumulation: int = 0  # Used to simplify straight movements for robot
+    straight_path = []
     for index, movement in enumerate(path):
-        file.write(f"\n# Moving to {str(movement.move_node)}\n")
+        if movement.angle != 0:
+            if straight_accumulation != 0:
+                file.write(f"\n# Moving straight from {straight_path[0]} -> {straight_path[-1]}\n")
+                file.write(f"robot.straight({straight_accumulation})\n")
+                straight_accumulation = 0
+                straight_path.clear()
 
-        try:
-            move_angle = movement.angle - path[index - 1].angle
-        except IndexError:
-            move_angle = movement.angle
-        move_angle = move_angle % 360
-        if abs(move_angle) > 180:
-            move_angle = (move_angle * -1)
-            if move_angle > 0:
-                move_angle -= 180
-            else:
-                move_angle += 180
-
-        if move_angle != 0:
-            file.write(f"robot.turn({move_angle})\ntime.sleep(0.5)\n")
-
-        file.write(f"robot.straight({round(movement.distance * 23.5) * -1})\n")
+            file.write(f"\n# Moving to {str(movement.move_node)}\n")
+            file.write(f"robot.turn({movement.angle})\ntime.sleep(0.5)\n")
+            file.write(f"robot.straight({round(movement.distance * 23.5) * -1})\n")
+        else:
+            straight_accumulation += round(movement.distance * 23.5) * -1
+            straight_path.append(str(movement.move_node))

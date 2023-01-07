@@ -153,3 +153,12 @@ def moveCost(hex1: Hexagon, hex2: Hexagon) -> int:
         return axial_vectors_cost
     else:
         logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")
+
+
+def shortest_angle(given_angle: int, desired_angle: int) -> int:
+    diff = desired_angle - given_angle
+    if diff > 180:
+        diff -= 360
+    elif diff < -180:
+        diff += 360
+    return diff
