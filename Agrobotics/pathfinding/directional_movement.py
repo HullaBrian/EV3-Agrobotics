@@ -7,22 +7,23 @@ from pathfinding.objects import movement_node
 def convert_to_directional_path(path: list[Hexagon]) -> list[movement_node]:
         from pathfinding.objects import moveCost
         from pathfinding.pathfinding import SmallGrid  # For pathfinding
-        path = path
+
         direction_path: list = []
 
+        # Wrong angles
         directional_vectors = {
-            (+1, -1): 0,
-            (+1, -2): 30,
-            (0, -1): 60,
-            (-1, -1): 90,
-            (-1, 0): 120,
-            (-2, +1): 150,
-            (-1, +1): 180,
-            (-1, +2): 210,
-            (0, +1): 240,
-            (+1, +1): 270,
-            (+1, 0): 300,
-            (+2, -1): 330
+            (+1, -1): 0,  # 90
+            (+1, -2): 30,  # 120
+            (0, -1): 60,  # 150
+            (-1, -1): 90,  # 180
+            (-1, 0): 120,  # -150
+            (-2, +1): 150,  # -120
+            (-1, +1): 180,  # -90
+            (-1, +2): 210,  # -60
+            (0, +1): 240,  # -30
+            (+1, +1): 270,  # 0
+            (+1, 0): 300,  # 30
+            (+2, -1): 330  # 60
         }
 
         current_angle = 90
