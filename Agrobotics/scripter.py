@@ -3,6 +3,7 @@ import os
 import sys
 
 from pathfinding.objects import convertToSmallGrid
+from pathfinding.objects import shortest_angle
 from pathfinding.pathfinding import SmallGrid
 from challenges import load_challenges
 
@@ -46,7 +47,13 @@ def write_instructions(lst, file_obj):
 
 START = convertToSmallGrid((7, 4))
 for challenge in load_challenges():
-    with open(f"out/{challenge.name}", "w") as file:
+    try:
+        open(f"out/{challenge.name}.py", "x").close()
+    except FileExistsError:
+        pass
+
+    with open(f"out/{challenge.name}.py", "w") as file:
+        logger.info(f"Processing '{challenge.name}' challenge")
         file.write("""#!/usr/bin/env pybricks-micropython
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
@@ -67,13 +74,20 @@ right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
 forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 """)
-    grid = SmallGrid()
-    path = grid.pathFind(START, challenge.target)
+        logger.debug("Wrote the building block!")
+        grid = SmallGrid()
+        end_angle = -10000000
 
-    file.write("\n\nGOING TO THE CHALLENGE\n\n")
-    write_instructions(path, file)
-    file.write("\nDOING THE CHALLENGE\n\n")
-    file.write(challenge.instructions + "\n")
-    file.write("\nRETURNING\n\n")
-    path = grid.pathFind(path[-1].move_node, START)  # TODO: INITIAL ANGLE IS NOT TAKEN INTO ACCOUNT WHEN RETURNING
-    write_instructions(path, file)
+        logger.debug("Writing path to challenge!")
+        file.write("\n\n# GOING TO THE CHALLENGE\n\n")
+        path, end_angle = grid.pathFind(START, challenge.target)
+        write_instructions(path, file)
+        logger.success(f"Wrote the '{challenge.name}' challenge path!")
+        file.write("\n# DOING THE CHALLENGE\n\n")
+        file.write(challenge.instructions + "\n")
+        logger.success(f"Wrote the '{challenge.name}' instructions!")
+        file.write("\n# RETURNING\n\n")
+        file.write(f"robot.turn({shortest_angle(end_angle, 0)})  # Orienting to 90 degrees!\n")
+        path, end_angle = grid.pathFind(challenge.target, START)
+        write_instructions(path, file)
+        logger.success(f"Wrote the '{challenge.name}' return path!")

@@ -79,7 +79,7 @@ class Grid(object):
         else:
             logger.error(f"Attempted to find cost of vector {vector} but {vector} not in vector lists")
 
-    def pathFind(self, start: tuple, end: tuple) -> list[movement_node]:
+    def pathFind(self, start: tuple, end: tuple) -> tuple[list[movement_node], int]:
         global previous_vector
 
         start_hexagon = self.grid[start[0]][start[1]]

@@ -5,7 +5,7 @@ from pathfinding.objects import movement_node
 from pathfinding.objects import shortest_angle
 
 
-def convert_to_directional_path(path: list[Hexagon]) -> list[movement_node]:
+def convert_to_directional_path(path: list[Hexagon]) -> tuple[list[movement_node], int]:
         from pathfinding.objects import moveCost
         from pathfinding.pathfinding import SmallGrid  # For pathfinding
 
@@ -46,4 +46,4 @@ def convert_to_directional_path(path: list[Hexagon]) -> list[movement_node]:
                 distance
             ))
 
-        return direction_path
+        return direction_path, current_angle
