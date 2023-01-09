@@ -1,19 +1,14 @@
 from loguru import logger
 import os
 import sys
-import math
-from pathfinding.objects import convertToSmallGrid
 
-from pathfinding.directional_movement import convert_to_directional_path
+from pathfinding.objects import convertToSmallGrid
 from pathfinding.pathfinding import SmallGrid
+from challenges import load_challenges
 
 
 logger.remove()
 logger.add(sys.stderr, level="DEBUG")
-
-start = convertToSmallGrid((7, 4))
-grid = SmallGrid()
-path = grid.pathFind(start, (41, 41))
 
 
 # Get output script path
@@ -30,8 +25,29 @@ if file_path == "":
     raise Exception("Obstacles file not found")
 
 
-with open(file_path, "w+") as file:
-    file.write("""#!/usr/bin/env pybricks-micropython
+def write_instructions(lst, file_obj):
+    straight_accumulation: int = 0  # Used to simplify straight movements for robot
+    straight_path = []
+    for index, movement in enumerate(path):
+        if movement.angle != 0:
+            if straight_accumulation != 0:
+                file.write(f"\n# Moving straight from {straight_path[0]} -> {straight_path[-1]}\n")
+                file.write(f"robot.straight({straight_accumulation})\n")
+                straight_accumulation = 0
+                straight_path.clear()
+
+            file.write(f"\n# Moving to {str(movement.move_node)}\n")
+            file.write(f"robot.turn({movement.angle})\ntime.sleep(0.5)\n")
+            file.write(f"robot.straight({round(movement.distance * 23.5) * -1})\n")
+        else:
+            straight_accumulation += round(movement.distance * 23.5) * -1
+            straight_path.append(str(movement.move_node))
+
+
+START = convertToSmallGrid((7, 4))
+for challenge in load_challenges():
+    with open(f"out/{challenge.name}", "w") as file:
+        file.write("""#!/usr/bin/env pybricks-micropython
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
@@ -51,20 +67,13 @@ right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
 forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 """)
+    grid = SmallGrid()
+    path = grid.pathFind(START, challenge.target)
 
-    straight_accumulation: int = 0  # Used to simplify straight movements for robot
-    straight_path = []
-    for index, movement in enumerate(path):
-        if movement.angle != 0:
-            if straight_accumulation != 0:
-                file.write(f"\n# Moving straight from {straight_path[0]} -> {straight_path[-1]}\n")
-                file.write(f"robot.straight({straight_accumulation})\n")
-                straight_accumulation = 0
-                straight_path.clear()
-
-            file.write(f"\n# Moving to {str(movement.move_node)}\n")
-            file.write(f"robot.turn({movement.angle})\ntime.sleep(0.5)\n")
-            file.write(f"robot.straight({round(movement.distance * 23.5) * -1})\n")
-        else:
-            straight_accumulation += round(movement.distance * 23.5) * -1
-            straight_path.append(str(movement.move_node))
+    file.write("\n\nGOING TO THE CHALLENGE\n\n")
+    write_instructions(path, file)
+    file.write("\nDOING THE CHALLENGE\n\n")
+    file.write(challenge.instructions + "\n")
+    file.write("\nRETURNING\n\n")
+    path = grid.pathFind(path[-1].move_node, START)  # TODO: INITIAL ANGLE IS NOT TAKEN INTO ACCOUNT WHEN RETURNING
+    write_instructions(path, file)
