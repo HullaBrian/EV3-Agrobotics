@@ -1,6 +1,7 @@
 from loguru import logger
 import os
 import sys
+import json
 
 from pathfinding.objects import convertToSmallGrid
 from pathfinding.objects import shortest_angle
@@ -29,23 +30,28 @@ if file_path == "":
 def write_instructions(lst, file_obj):
     straight_accumulation: int = 0  # Used to simplify straight movements for robot
     straight_path = []
-    for index, movement in enumerate(path):
+    for index, movement in enumerate(lst):
         if movement.angle != 0:
             if straight_accumulation != 0:
-                file.write(f"\n# Moving straight from {straight_path[0]} -> {straight_path[-1]}\n")
-                file.write(f"robot.straight({straight_accumulation})\n")
+                file_obj.write(f"\n# Moving straight from {straight_path[0]} -> {straight_path[-1]}\n")
+                file_obj.write(f"robot.straight({straight_accumulation})\n")
                 straight_accumulation = 0
                 straight_path.clear()
 
-            file.write(f"\n# Moving to {str(movement.move_node)}\n")
-            file.write(f"robot.turn({movement.angle})\ntime.sleep(0.5)\n")
-            file.write(f"robot.straight({round(movement.distance * 23.5) * -1})\n")
+            file_obj.write(f"\n# Moving to {str(movement.move_node)}\n")
+            file_obj.write(f"robot.turn({movement.angle})\ntime.sleep(0.5)\n")
+            file_obj.write(f"robot.straight({round(movement.distance * 23.5) * -1})\n")
         else:
             straight_accumulation += round(movement.distance * 23.5) * -1
             straight_path.append(str(movement.move_node))
 
 
 START = convertToSmallGrid((7, 4))
+
+config_file = open(os.path.join(os.getcwd(), "challenges", "config.json"), "r")
+config = json.load(config_file)
+config_file.close()
+
 for challenge in load_challenges():
     try:
         open(f"out/{challenge.name}.py", "x").close()
@@ -54,7 +60,7 @@ for challenge in load_challenges():
 
     with open(f"out/{challenge.name}.py", "w") as file:
         logger.info(f"Processing '{challenge.name}' challenge")
-        file.write("""#!/usr/bin/env pybricks-micropython
+        file.write(f"""#!/usr/bin/env pybricks-micropython
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
@@ -69,10 +75,11 @@ import time
 # Create your objects here.
 ev3 = EV3Brick()
 
-left_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
-right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
-forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
-robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
+left_motor = Motor(Port.{config["left motor"]}, Direction.COUNTERCLOCKWISE)
+right_motor = Motor(Port.{config["right motor"]}, Direction.COUNTERCLOCKWISE)
+upper_deck = Motor(Port.{config["upper deck"]}, positive_direction=Direction.CLOCKWISE)
+lower_deck = Motor(Port.{config["lower deck"]}, positive_direction=Direction.CLOCKWISE)
+robot = DriveBase(left_motor, right_motor, wheel_diameter={config["wheel diameter"]}, axle_track={config["axle track"]})
 """)
         logger.debug("Wrote the building block!")
         grid = SmallGrid()
