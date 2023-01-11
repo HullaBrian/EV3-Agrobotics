@@ -53,6 +53,7 @@ config = json.load(config_file)
 config_file.close()
 
 for challenge in load_challenges():
+    # todo: Write support for multiple locations for challenges!
     try:
         open(f"out/{challenge.name}.py", "x").close()
     except FileExistsError:
