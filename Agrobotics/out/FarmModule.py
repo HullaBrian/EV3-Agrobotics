@@ -15,7 +15,8 @@ ev3 = EV3Brick()
 
 left_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
 right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
-forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
+upper_deck = Motor(Port.A, positive_direction=Direction.CLOCKWISE)
+lower_deck = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 
 

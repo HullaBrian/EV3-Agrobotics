@@ -15,59 +15,79 @@ ev3 = EV3Brick()
 
 left_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
 right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
-forklift = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
+upper_deck = Motor(Port.A, positive_direction=Direction.CLOCKWISE)
+lower_deck = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 
 
 # GOING TO THE CHALLENGE
 
 
-# Moving to (28,31)
-robot.turn(-60)
-time.sleep(0.5)
-robot.straight(-70)
-
-# Moving straight from (27,33) -> (25,37)
-robot.straight(-210)
-
-# Moving to (24,38)
-robot.turn(-30)
+# Moving to (30,28)
+robot.turn(90)
 time.sleep(0.5)
 robot.straight(-41)
 
-# Moving to (23,40)
-robot.turn(30)
+# Moving straight from (31,27) -> (33,25)
+robot.straight(-123)
+
+# Moving to (35,24)
+robot.turn(-30)
 time.sleep(0.5)
 robot.straight(-70)
 
-# Moving straight from (22,42) -> (21,44)
+# Moving to (36,23)
+robot.turn(30)
+time.sleep(0.5)
+robot.straight(-41)
+
+# Moving straight from (37,22) -> (42,17)
+robot.straight(-246)
+
+# Moving to (44,16)
+robot.turn(-30)
+time.sleep(0.5)
+robot.straight(-70)
+
+# Moving straight from (46,15) -> (48,14)
 robot.straight(-140)
 
-# Moving to (21,45)
+# Moving to (49,13)
 robot.turn(30)
 time.sleep(0.5)
 robot.straight(-41)
 
-# Moving straight from (21,46) -> (21,54)
-robot.straight(-369)
+# Moving straight from (50,12) -> (50,12)
+robot.straight(-41)
 
-# Moving to (20,56)
+# Moving to (52,11)
 robot.turn(-30)
 time.sleep(0.5)
 robot.straight(-70)
 
-# Moving straight from (19,58) -> (18,60)
+# Moving straight from (54,10) -> (56,9)
 robot.straight(-140)
 
-# Moving to (18,61)
-robot.turn(30)
+# Moving to (57,9)
+robot.turn(-30)
 time.sleep(0.5)
 robot.straight(-41)
 
-# Moving to (17,63)
+# Moving straight from (58,9) -> (60,9)
+robot.straight(-123)
+
+# Moving to (61,10)
 robot.turn(-30)
 time.sleep(0.5)
 robot.straight(-70)
+
+# Moving straight from (62,11) -> (63,12)
+robot.straight(-140)
+
+# Moving to (64,12)
+robot.turn(30)
+time.sleep(0.5)
+robot.straight(-41)
 
 # DOING THE CHALLENGE
 
@@ -75,66 +95,17 @@ robot.straight(-70)
 
 # RETURNING
 
-robot.turn(60)  # Orienting to 90 degrees!
+robot.turn(-30)  # Orienting to 90 degrees!
 
-# Moving to (57,17)
-robot.turn(-90)
-time.sleep(0.5)
-robot.straight(-41)
-
-# Moving to (55,18)
-robot.turn(-30)
+# Moving to (27,39)
+robot.turn(120)
 time.sleep(0.5)
 robot.straight(-70)
 
-# Moving to (54,19)
+# Moving straight from (28,37) -> (29,35)
+robot.straight(-140)
+
+# Moving to (29,34)
 robot.turn(30)
-time.sleep(0.5)
-robot.straight(-41)
-
-# Moving to (53,21)
-robot.turn(30)
-time.sleep(0.5)
-robot.straight(-70)
-
-# Moving straight from (52,23) -> (52,23)
-robot.straight(-70)
-
-# Moving to (50,24)
-robot.turn(-60)
-time.sleep(0.5)
-robot.straight(-70)
-
-# Moving to (49,25)
-robot.turn(30)
-time.sleep(0.5)
-robot.straight(-41)
-
-# Moving straight from (48,26) -> (48,26)
-robot.straight(-41)
-
-# Moving to (46,27)
-robot.turn(-30)
-time.sleep(0.5)
-robot.straight(-70)
-
-# Moving straight from (44,28) -> (44,28)
-robot.straight(-70)
-
-# Moving to (43,28)
-robot.turn(-30)
-time.sleep(0.5)
-robot.straight(-41)
-
-# Moving straight from (42,28) -> (35,28)
-robot.straight(-328)
-
-# Moving to (33,29)
-robot.turn(30)
-time.sleep(0.5)
-robot.straight(-70)
-
-# Moving to (32,29)
-robot.turn(-30)
 time.sleep(0.5)
 robot.straight(-41)

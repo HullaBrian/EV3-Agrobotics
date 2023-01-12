@@ -1,5 +1,6 @@
 # DO NOT RUN ON EV3
 # For generating the shortest path between two nodes
+# todo remove ALL pathfinding and instead implement manual pathing (Input hex coords and robots paths to them)
 
 # Builtin modules
 import math

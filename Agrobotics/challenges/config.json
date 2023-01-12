@@ -1,8 +1,7 @@
 {
   "right wheel": "B",
-  "left_wheel": "D",
-  "upper deck": "A",
-  "lower deck:": "C",
+  "left wheel": "D",
+  "robo gun": "C",
   "wheel diameter": 82,
   "axle track": 101
 }

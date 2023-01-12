@@ -10,7 +10,7 @@ from challenges import load_challenges
 
 
 logger.remove()
-logger.add(sys.stderr, level="DEBUG")
+logger.add(sys.stderr, level="INFO")
 
 
 # Get output script path
@@ -76,10 +76,9 @@ import time
 # Create your objects here.
 ev3 = EV3Brick()
 
-left_motor = Motor(Port.{config["left motor"]}, Direction.COUNTERCLOCKWISE)
-right_motor = Motor(Port.{config["right motor"]}, Direction.COUNTERCLOCKWISE)
-upper_deck = Motor(Port.{config["upper deck"]}, positive_direction=Direction.CLOCKWISE)
-lower_deck = Motor(Port.{config["lower deck"]}, positive_direction=Direction.CLOCKWISE)
+left_motor = Motor(Port.{config["left wheel"]}, Direction.COUNTERCLOCKWISE)
+right_motor = Motor(Port.{config["right wheel"]}, Direction.COUNTERCLOCKWISE)
+robo_gun = Motor(Port.{config["robo gun"]}, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter={config["wheel diameter"]}, axle_track={config["axle track"]})
 """)
         logger.debug("Wrote the building block!")
