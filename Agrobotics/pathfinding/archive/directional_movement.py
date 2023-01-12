@@ -1,13 +1,12 @@
 # Directional movement script that takes the path generated in pathfinding.py and gets the rotations needed
 # to execute the path on the robot
-from pathfinding.objects import Hexagon
-from pathfinding.objects import movement_node
-from pathfinding.objects import shortest_angle
+from Agrobotics.pathfinding.archive.pathfinding import Hexagon
+from Agrobotics.pathfinding.archive.pathfinding import movement_node
+from Agrobotics.pathfinding.archive.pathfinding import shortest_angle
 
 
 def convert_to_directional_path(path: list[Hexagon]) -> tuple[list[movement_node], int]:
-        from pathfinding.objects import moveCost
-        from pathfinding.pathfinding import SmallGrid  # For pathfinding
+        from Agrobotics.pathfinding.archive.pathfinding import moveCost
 
         direction_path: list = []
 

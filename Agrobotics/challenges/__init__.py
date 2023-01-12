@@ -12,7 +12,7 @@ def get_trailing_number(s) -> int:
 
 def load_challenges() -> list[Challenge]:
     challenges: list[Challenge] = []
-    with open(os.path.join(os.getcwd(), "challenges", "challenges.csv"), "r") as file:
+    with open(os.path.join(os.getcwd(), "challenges", "../pathfinding/archive/challenges.csv"), "r") as file:
         reader = csv.reader(file)
         _ = next(reader)  # Names for each field
 

@@ -1,1 +1,1 @@
-from pathfinding import *
+from Agrobotics.pathfinding.archive.pathfinding import *
