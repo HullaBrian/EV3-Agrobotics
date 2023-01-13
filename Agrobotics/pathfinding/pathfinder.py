@@ -27,6 +27,7 @@ directional_vectors = {
             (+2, -1): 60
 }
 logger.debug("Loaded directional vectors!")
+sqrt3 = math.sqrt(3)
 
 
 def angle_between_hexes(hex1: tuple[int, int], hex2: tuple[int, int]) -> int:
@@ -35,6 +36,18 @@ def angle_between_hexes(hex1: tuple[int, int], hex2: tuple[int, int]) -> int:
 
 def distance_between_hexes(hex1: tuple[int, int], hex2: tuple[int, int]) -> int:
     pass
+
+
+def hexToRect(Coord: tuple) -> tuple:
+    r = Coord[0]
+    q = Coord[1]
+
+    x = 46 - (q - r)
+    y = 82 - (r + q)
+    x *= round(3 * sqrt3)
+    y *= 3
+
+    return (x, y)  # Coordinates are in terms of half radii; x is approximated to nearest half radius
 
 
 def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths" is relative to the "scripter.py" file (the main code)
@@ -47,21 +60,26 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
     out: list[str] = []
 
     with open(path_ref, "r") as path_file:
-        path = path_file.readlines()
+        path: list[tuple[int, int]] = []
+        for line in path_file.readlines():
+            path.append(tuple(int(coord) for coord in line.split(" ")))
 
-    for i in range(len(path)):
-        path[i] = tuple(int(j) for j in path[i].split(" "))
-    if start_tile == (-1, -1):
-        start_tile = tuple(int(i) for i in path[0].split(" "))
+    if start_tile != (-1, -1):
+        path.insert(0, start_tile)
 
     current_angle = 0
     for cur_index, cur_node in enumerate(path[:-1]):
         next_node = path[cur_index + 1]
 
         diff = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
-        angle = -1 * math.degrees(math.atan((diff[1]) / diff[0]))
-        print(angle)
+        try:
+            desired_angle = directional_vectors[diff]
+        except KeyError:
+            diff = (hexToRect((next_node[0] - cur_node[0], next_node[1] - cur_node[1])))
+            desired_angle = -1 * math.atan((diff[0]) / diff[1])
+
+        logger.debug(f"Angle between '{cur_node}' and '{next_node}' is '{desired_angle}'")
 
 
 if __name__ == "__main__":
-    pathfind("paths/example.txt", (7, 7))
+    pathfind("paths/testing/vectors.txt")
