@@ -3,6 +3,7 @@
 # Builtins
 import os
 import json
+import math
 
 # 3rd party
 from loguru import logger
@@ -48,13 +49,19 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
     with open(path_ref, "r") as path_file:
         path = path_file.readlines()
 
+    for i in range(len(path)):
+        path[i] = tuple(int(j) for j in path[i].split(" "))
     if start_tile == (-1, -1):
         start_tile = tuple(int(i) for i in path[0].split(" "))
 
     current_angle = 0
     for cur_index, cur_node in enumerate(path[:-1]):
-        next_node = path[cur_index]
+        next_node = path[cur_index + 1]
+
+        diff = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
+        angle = -1 * math.degrees(math.atan((diff[1]) / diff[0]))
+        print(angle)
 
 
 if __name__ == "__main__":
-    pathfind("paths", (7, 7))
+    pathfind("paths/example.txt", (7, 7))
