@@ -21,8 +21,6 @@ class Hexagon(object):
 
         self.obstacle: bool = obstacle
 
-        logger.debug(f"Created new Hexagon at ({self.q},{self.r})")
-
     def __str__(self):
         return f"({self.q},{self.r})"
 

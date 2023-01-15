@@ -30,24 +30,39 @@ logger.debug("Loaded directional vectors!")
 sqrt3 = math.sqrt(3)
 
 
-def angle_between_hexes(hex1: tuple[int, int], hex2: tuple[int, int]) -> int:
+def angle_between_hexes(delta_hex: tuple[int, int]) -> int:
+    try:
+        desired_angle = directional_vectors[delta_hex]
+    except KeyError:
+        try:
+            desired_angle = round(math.degrees(-1 * math.atan((delta_hex[0]) / delta_hex[1])) + 0.5)  # Round it up
+        except ZeroDivisionError:
+            if delta_hex[0] == 0:
+                if delta_hex[1] > 0:
+                    desired_angle = 30
+                else:
+                    desired_angle = 210
+            else:
+                if delta_hex[0] > 0:
+                    desired_angle = 90
+                else:
+                    desired_angle = 270
+
+    return desired_angle
+
+
+def shortest_angle(given_angle: int, desired_angle: int) -> int:
+    diff = desired_angle - given_angle
+    if diff > 180:
+        diff -= 360
+    elif diff < -180:
+        diff += 360
+    return diff
+
+
+
+def distance_between_hexes(delta_hex: tuple[int, int]) -> int:
     pass
-
-
-def distance_between_hexes(hex1: tuple[int, int], hex2: tuple[int, int]) -> int:
-    pass
-
-
-def hexToRect(Coord: tuple) -> tuple:
-    r = Coord[0]
-    q = Coord[1]
-
-    x = 46 - (q - r)
-    y = 82 - (r + q)
-    x *= round(3 * sqrt3)
-    y *= 3
-
-    return (x, y)  # Coordinates are in terms of half radii; x is approximated to nearest half radius
 
 
 def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths" is relative to the "scripter.py" file (the main code)
@@ -71,14 +86,9 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
     for cur_index, cur_node in enumerate(path[:-1]):
         next_node = path[cur_index + 1]
 
-        diff = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
-        try:
-            desired_angle = directional_vectors[diff]
-        except KeyError:
-            diff = (hexToRect((next_node[0] - cur_node[0], next_node[1] - cur_node[1])))
-            desired_angle = -1 * math.atan((diff[0]) / diff[1])
-
-        logger.debug(f"Angle between '{cur_node}' and '{next_node}' is '{desired_angle}'")
+        difference = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
+        turn_angle = shortest_angle(current_angle, angle_between_hexes(delta_hex=difference))
+        current_angle = turn_angle
 
 
 if __name__ == "__main__":
