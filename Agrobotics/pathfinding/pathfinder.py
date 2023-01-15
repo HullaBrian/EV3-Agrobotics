@@ -27,6 +27,17 @@ directional_vectors = {
             (+2, -1): 60
 }
 logger.debug("Loaded directional vectors!")
+
+axial_direction_vectors = [
+    (0, -1), (-1, 0), (-1, +1),
+    (0, +1), (+1, 0), (+1, -1)
+]
+weighted_axial_direction_vectors = [
+    (-1, -1), (-2, +1), (-1, +2),
+    (+1, +1), (+2, -1), (+1, -2)
+]
+logger.debug("Loaded vectors!")
+
 sqrt3 = math.sqrt(3)
 
 
@@ -60,9 +71,15 @@ def shortest_angle(given_angle: int, desired_angle: int) -> int:
     return diff
 
 
+def distance_between_hexes(angle, delta_hex: tuple[int, int]) -> int:
+    flat_sided_distance = sqrt3
+    angle_distance = 1
 
-def distance_between_hexes(delta_hex: tuple[int, int]) -> int:
-    pass
+    if angle % 90 == 90:
+        diff = delta_hex[0] if delta_hex[0] != 0 else delta_hex[1]
+        return int(diff * flat_sided_distance)
+    else:
+        return int(math.sqrt(delta_hex[0] ** 2 + delta_hex[1] ** 2) * angle_distance)
 
 
 def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths" is relative to the "scripter.py" file (the main code)
@@ -87,8 +104,13 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
         next_node = path[cur_index + 1]
 
         difference = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
-        turn_angle = shortest_angle(current_angle, angle_between_hexes(delta_hex=difference))
+
+        desired_angle = angle_between_hexes(delta_hex=difference)
+        turn_angle = shortest_angle(current_angle, desired_angle)
         current_angle = turn_angle
+
+        distance = distance_between_hexes(angle=desired_angle, delta_hex=difference)
+        logger.debug(f"Current node: '{str(cur_node)}', Next node: '{str(next_node)}', Desired Angle: '{desired_angle}', Distance: '{str(distance)}'")
 
 
 if __name__ == "__main__":
