@@ -1,9 +1,8 @@
 # pathfinder.py: used to pathfind using a hybrid pathfinding system
 
 # Builtins
-import os
-import json
 import math
+from dataclasses import dataclass
 
 # 3rd party
 from loguru import logger
@@ -41,25 +40,25 @@ logger.debug("Loaded vectors!")
 sqrt3 = math.sqrt(3)
 
 
-def angle_between_hexes(delta_hex: tuple[int, int]) -> int:
+def angle_between_hexes(delta_hex: tuple[int, int]) -> float:
     try:
         desired_angle = directional_vectors[delta_hex]
     except KeyError:
         try:
-            desired_angle = round(math.degrees(-1 * math.atan((delta_hex[0]) / delta_hex[1])) + 0.5)  # Round it up
+            desired_angle = math.degrees(-1 * math.atan((delta_hex[0]) / delta_hex[1]))  # Round it up
         except ZeroDivisionError:
             if delta_hex[0] == 0:
                 if delta_hex[1] > 0:
-                    desired_angle = 30
+                    desired_angle = 30.0
                 else:
-                    desired_angle = 210
+                    desired_angle = 210.0
             else:
                 if delta_hex[0] > 0:
-                    desired_angle = 90
+                    desired_angle = 90.0
                 else:
-                    desired_angle = 270
+                    desired_angle = 270.0
 
-    return desired_angle
+    return float(desired_angle)
 
 
 def shortest_angle(given_angle: int, desired_angle: int) -> int:
@@ -82,6 +81,14 @@ def distance_between_hexes(angle, delta_hex: tuple[int, int]) -> int:
         return int(math.sqrt(delta_hex[0] ** 2 + delta_hex[1] ** 2) * angle_distance)
 
 
+@dataclass
+class movement_node:
+    move_node: tuple[int, int]  # Hexagon to move to
+    start_node: tuple[int, int]  # Hexagon moved from
+    angle: float  # Angle to move at
+    distance: int  # Distance to move
+
+
 def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths" is relative to the "scripter.py" file (the main code)
     """
     Will take the path to a .txt containing the path, then generate the robot code necessary to do that path
@@ -89,12 +96,16 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
     """
     logger.info("Generating path from path file...")
 
-    out: list[str] = []
+    out: list[movement_node] = []
 
-    with open(path_ref, "r") as path_file:
-        path: list[tuple[int, int]] = []
-        for line in path_file.readlines():
-            path.append(tuple(int(coord) for coord in line.split(" ")))
+    try:
+        with open(path_ref, "r") as path_file:
+            path: list[tuple[int, int]] = []
+            for line in path_file.readlines():
+                path.append(tuple(int(coord) for coord in line.split(" ")))
+    except FileNotFoundError:
+        logger.critical(f"Path file not found! Path: '{path_ref}'")
+        return []
 
     if start_tile != (-1, -1):
         path.insert(0, start_tile)
@@ -110,8 +121,14 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
         current_angle = turn_angle
 
         distance = distance_between_hexes(angle=desired_angle, delta_hex=difference)
+        out.append(movement_node(
+            move_node=next_node,
+            start_node=cur_node,
+            angle=turn_angle,
+            distance=distance
+        ))
         logger.debug(f"Current node: '{str(cur_node)}', Next node: '{str(next_node)}', Desired Angle: '{desired_angle}', Distance: '{str(distance)}'")
 
 
 if __name__ == "__main__":
-    pathfind("paths/testing/vectors.txt")
+    pathfind("paths/testing/example.txt")
