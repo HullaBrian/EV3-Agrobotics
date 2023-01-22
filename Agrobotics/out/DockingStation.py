@@ -22,7 +22,7 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 # ----MAIN---- #
 
 
-# Moving to (40, 39)
-robot.turn(-17.72631099390628)
+# Moving to (41, 17)
+robot.turn(90.0)
 time.sleep(0.5)
-robot.straight(-822)
+robot.straight(1402)
