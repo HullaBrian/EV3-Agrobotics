@@ -110,7 +110,7 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
     if start_tile != (-1, -1):
         path.insert(0, start_tile)
 
-    current_angle = 0
+    current_angle = 330
     for cur_index, cur_node in enumerate(path[:-1]):
         next_node = path[cur_index + 1]
 
@@ -125,9 +125,11 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
             move_node=next_node,
             start_node=cur_node,
             angle=turn_angle,
-            distance=distance
+            distance=distance * 2.5
         ))
-        logger.debug(f"Current node: '{str(cur_node)}', Next node: '{str(next_node)}', Desired Angle: '{desired_angle}', Distance: '{str(distance)}'")
+        logger.debug(f"Current node: '{str(cur_node)}', Next node: '{str(next_node)}', Desired Angle: '{desired_angle}', Distance: '{str(distance * 2.5)}'")
+
+        return out
 
 
 if __name__ == "__main__":

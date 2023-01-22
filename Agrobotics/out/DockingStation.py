@@ -13,11 +13,16 @@ import time
 # Create your objects here.
 ev3 = EV3Brick()
 
-left_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
-right_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
+left_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
+right_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
 robo_gun = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
 
 
 # ----MAIN---- #
 
+
+# Moving to (40, 39)
+robot.turn(-17.72631099390628)
+time.sleep(0.5)
+robot.straight(-822)
