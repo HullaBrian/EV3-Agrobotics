@@ -82,7 +82,7 @@ logger.success("All threads have finished!")
 logger.info("Writing all instructions to out files...")
 
 
-def write_instructions(lst: list, file_obj):
+def write_pathfinding(lst: list, file_obj):
     straight_accumulation: int = 0  # Used to simplify straight movements for robot
     straight_path = []
     try:
@@ -109,12 +109,20 @@ def write_instructions(lst: list, file_obj):
             logger.error(file_obj.name + " does not instructions to write!")
 
 
+def write_instructions(file_name: str, file_obj):
+    with open(os.path.join("challenges", "instructions", file_name), "r") as file:
+        file_obj.writelines(file.readlines())
+
+
 for file_name in paths_dict:
     logger.info(f"Writing instructions for '{file_name}'")
     with open(os.path.join("out", file_name.split(os.sep)[-1].replace(".txt", ".py")), "w") as path_file:
-        path_file.write(base + "\n\n# ----MAIN---- #\n\n")
-        logger.debug("Wrote base code.")
-        write_instructions(paths_dict[file_name], path_file)
+        path_file.write(base + "\n\n# ----PATHFINDING---- #\n")
+        logger.debug("Wrote base code")
+        write_pathfinding(paths_dict[file_name], path_file)
+        path_file.write("\n# ----INSTRUCTIONS---- #\n")
+        logger.debug("Wrote pathfinding")
+        write_instructions(file_name.split(os.sep)[-1], path_file)
         logger.debug("Wrote instructions")
     logger.success(f"Wrote instructions for '{file_name}'")
 logger.success("Successfully wrote all instructions to out files!")
