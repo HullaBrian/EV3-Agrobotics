@@ -16,7 +16,7 @@ ev3 = EV3Brick()
 left_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
 right_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
 robo_gun = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
-robot = DriveBase(left_motor, right_motor, wheel_diameter=82, axle_track=101)
+robot = DriveBase(left_motor, right_motor, wheel_diameter=83, axle_track=100)
 
 
 # ----MAIN---- #

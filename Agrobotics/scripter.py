@@ -87,6 +87,7 @@ def write_instructions(lst: list, file_obj):
     straight_path = []
     try:
         for index, movement in enumerate(lst):
+            movement.distance *= -1 * 13  # -1 to invert motion and 13 to adjust distance variable to reflect mm's
             if movement.angle != 0:
                 if straight_accumulation != 0:
                     file_obj.write(f"\n# Moving straight from {straight_path[0]} -> {straight_path[-1]}\n")
@@ -96,13 +97,13 @@ def write_instructions(lst: list, file_obj):
 
                 file_obj.write(f"\n# Moving to {str(movement.move_node)}\n")
                 file_obj.write(f"robot.turn({movement.angle})\ntime.sleep(0.5)\n")
-                file_obj.write(f"robot.straight({round(movement.distance * 11.68)})\n")
+                file_obj.write(f"robot.straight({round(movement.distance)})\n")
             else:
-                straight_accumulation += round(movement.distance * 11.68)
+                straight_accumulation += round(movement.distance)
                 straight_path.append(str(movement.move_node))
 
                 if len(lst) == 1:
-                    file_obj.write(f"robot.straight({round(movement.distance * 11.68)})\n")
+                    file_obj.write(f"robot.straight({round(movement.distance)})\n")
     except TypeError:
         if lst is None:
             logger.error(file_obj.name + " does not instructions to write!")

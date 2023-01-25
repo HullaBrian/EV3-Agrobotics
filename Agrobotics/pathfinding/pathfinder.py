@@ -94,7 +94,7 @@ class movement_node:
     distance: int  # Distance to move
 
 
-def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths" is relative to the "scripter.py" file (the main code)
+def pathfind(path_ref, start_tile=None) -> list[str]:  # "pathfinding/paths" is relative to the "scripter.py" file (the main code)
     """
     Will take the path to a .txt containing the path, then generate the robot code necessary to do that path
     Returns an array, where the rows are the lines to write
@@ -112,11 +112,12 @@ def pathfind(path_ref, start_tile=(-1, -1)) -> list[str]:  # "pathfinding/paths"
         logger.critical(f"Path file not found! Path: '{path_ref}'")
         return []
 
-    if start_tile != (-1, -1):
+    if start_tile == (-1, -1):
         path.insert(0, start_tile)
 
     current_angle = 0
-    for cur_index, cur_node in enumerate(path[:-1]):
+    for cur_index, cur_node in enumerate(path):
+        logger.debug(str(cur_node))
         next_node = path[cur_index + 1]
 
         node_1 = hexToRect(cur_node)
