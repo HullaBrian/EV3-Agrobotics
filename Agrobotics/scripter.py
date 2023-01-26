@@ -43,6 +43,12 @@ left_motor = Motor(Port.{config["left wheel"]}, Direction.COUNTERCLOCKWISE)
 right_motor = Motor(Port.{config["right wheel"]}, Direction.COUNTERCLOCKWISE)
 robo_gun = Motor(Port.{config["robo gun"]}, positive_direction=Direction.CLOCKWISE)
 robot = DriveBase(left_motor, right_motor, wheel_diameter={config["wheel diameter"]}, axle_track={config["axle track"]})
+
+
+def run_robo_gun(speed: int, rotations: int):
+    for i in range(rotations):
+        robo_gun.run_until_stalled(speed, duty_limit=80)
+        speed *= -1
 """
 logger.success("Applied config!")
 
