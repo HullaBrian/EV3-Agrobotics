@@ -40,6 +40,7 @@ logger.debug("Loaded vectors!")
 sqrt3 = math.sqrt(3)
 
 
+"""
 def hexToRect(Coord: tuple) -> tuple:
     r = Coord[0]
     q = Coord[1]
@@ -50,8 +51,18 @@ def hexToRect(Coord: tuple) -> tuple:
     y = y * 3
 
     return (x, y)  # Coordinates are in terms of half radii; x is approximated to nearest half radius
+"""
 
 
+def hexToRect(Coord: tuple):
+    r = Coord[0]
+    q = Coord[1]
+    x = q * sqrt3
+    y = r * sqrt3 * 3 / 2
+    logger.debug(f"Hex '({r},{q})' -> Rect '({x},{y})'")
+    return x, y
+
+"""
 def angle_between_hexes(delta_hex: tuple[int, int]) -> float:
     try:
         desired_angle = directional_vectors[delta_hex]
@@ -71,6 +82,24 @@ def angle_between_hexes(delta_hex: tuple[int, int]) -> float:
                     desired_angle = 270.0
 
     return float(desired_angle)
+"""
+
+
+def angle_between_hexes(delta_hex):
+    try:
+        if abs(delta_hex[0]) == abs(delta_hex[1]):
+            try:
+                tmp1 = delta_hex[0] / delta_hex[1]
+                tmp1 *= -1 if delta_hex[0] < 1 else 1
+
+                tmp2 = delta_hex[1] / delta_hex[0]
+                tmp2 *= -1 if delta_hex[1] < 1 else 1
+            except ZeroDivisionError:
+                pass
+        angle = directional_vectors[(tmp1, tmp2)]
+    except KeyError:
+        angle = math.degrees(math.atan2(delta_hex[0], delta_hex[1]))
+    return angle
 
 
 def shortest_angle(given_angle: int, desired_angle: int) -> int:
@@ -82,8 +111,10 @@ def shortest_angle(given_angle: int, desired_angle: int) -> int:
     return diff
 
 
-def distance_between_hexes(delta_hex: tuple[int, int]) -> int:
-    return int(math.sqrt(delta_hex[0] ** 2 + delta_hex[1] ** 2))
+def distance_between_hexes(delta_hex: tuple[int, int]) -> float:
+    return (abs(delta_hex[0])
+            + abs(delta_hex[0] + delta_hex[1])
+            + abs(delta_hex[1])) / 2
 
 
 @dataclass
@@ -119,19 +150,20 @@ def pathfind(path_ref) -> list[movement_node]:  # "pathfinding/paths" is relativ
         node_1 = hexToRect(cur_node)
         node_2 = hexToRect(next_node)
         rect_difference = (node_2[0] - node_1[0], node_2[1] - node_1[1])
+        hex_difference = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
 
-        desired_angle = angle_between_hexes(delta_hex=rect_difference)
+        desired_angle = angle_between_hexes(delta_hex=hex_difference)
         turn_angle = shortest_angle(current_angle, desired_angle)
         current_angle = turn_angle
 
-        distance = distance_between_hexes(delta_hex=rect_difference)
+        distance = distance_between_hexes(delta_hex=hex_difference)
         out.append(movement_node(
             move_node=next_node,
             start_node=cur_node,
             angle=turn_angle,
             distance=int(distance)
         ))
-        logger.debug(f"Current node: '{str(cur_node)}', Next node: '{str(next_node)}', Desired Angle: '{desired_angle}', Distance: '{str(distance * 2.5)}'")
+        logger.debug(f"Current node: '{str(cur_node)}', Next node: '{str(next_node)}', Desired Angle: '{desired_angle}', Distance: '{str(distance)}'")
 
     return out
 
