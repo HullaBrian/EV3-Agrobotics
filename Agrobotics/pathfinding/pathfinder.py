@@ -87,16 +87,18 @@ def angle_between_hexes(delta_hex: tuple[int, int]) -> float:
 
 def angle_between_hexes(delta_hex):
     try:
+        q = delta_hex[0]
+        r = delta_hex[1]
         if abs(delta_hex[0]) == abs(delta_hex[1]):
             try:
-                tmp1 = delta_hex[0] / delta_hex[1]
-                tmp1 *= -1 if delta_hex[0] < 1 else 1
+                q = delta_hex[0] / delta_hex[1]
+                q *= -1 if delta_hex[0] < 1 else 1
 
-                tmp2 = delta_hex[1] / delta_hex[0]
-                tmp2 *= -1 if delta_hex[1] < 1 else 1
+                r = delta_hex[1] / delta_hex[0]
+                r *= -1 if delta_hex[1] < 1 else 1
             except ZeroDivisionError:
                 pass
-        angle = directional_vectors[(tmp1, tmp2)]
+        angle = directional_vectors[(q, r)]
     except KeyError:
         angle = math.degrees(math.atan2(delta_hex[0], delta_hex[1]))
     return angle
