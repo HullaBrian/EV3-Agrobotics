@@ -26,21 +26,9 @@ directional_vectors = {
             (+2, -1): 60
 }
 logger.debug("Loaded directional vectors!")
-
-axial_direction_vectors = [
-    (0, -1), (-1, 0), (-1, +1),
-    (0, +1), (+1, 0), (+1, -1)
-]
-weighted_axial_direction_vectors = [
-    (-1, -1), (-2, +1), (-1, +2),
-    (+1, +1), (+2, -1), (+1, -2)
-]
-logger.debug("Loaded vectors!")
-
 sqrt3 = math.sqrt(3)
 
 
-"""
 def hexToRect(Coord: tuple) -> tuple:
     r = Coord[0]
     q = Coord[1]
@@ -51,45 +39,12 @@ def hexToRect(Coord: tuple) -> tuple:
     y = y * 3
 
     return (x, y)  # Coordinates are in terms of half radii; x is approximated to nearest half radius
-"""
 
 
-def hexToRect(Coord: tuple):
-    r = Coord[0]
-    q = Coord[1]
-    x = q * sqrt3
-    y = r * sqrt3 * 3 / 2
-    logger.debug(f"Hex '({r},{q})' -> Rect '({x},{y})'")
-    return x, y
-
-"""
-def angle_between_hexes(delta_hex: tuple[int, int]) -> float:
-    try:
-        desired_angle = directional_vectors[delta_hex]
-    except KeyError:
-        try:
-            desired_angle = math.degrees(-1 * math.atan((delta_hex[0]) / delta_hex[1]))
-        except ZeroDivisionError:
-            if delta_hex[0] == 0:
-                if delta_hex[1] > 0:
-                    desired_angle = 30.0
-                else:
-                    desired_angle = 210.0
-            else:
-                if delta_hex[0] > 0:
-                    desired_angle = 90.0
-                else:
-                    desired_angle = 270.0
-
-    return float(desired_angle)
-"""
-
-
-def angle_between_hexes(delta_hex):
-    logger.info(f"Checking the angle between hexes, where delta hex is '{delta_hex}'")
+def angle_between_hexes(delta_hex) -> int:
     if delta_hex[0] == 0:
         if delta_hex[1] > 0:
-            return 300  # -10, 20
+            return 330
         return 150
     if delta_hex[1] == 0:
         if delta_hex[0] > 0:
@@ -104,14 +59,13 @@ def angle_between_hexes(delta_hex):
             if delta_hex[0] > 0:
                 return 90
             return 270  # 15, -15
-    if delta_hex[0] % 2 == 0 and abs(delta_hex[1]) % 2 != 0:
+    if delta_hex[0] % 2 == 0 and abs(delta_hex[1]) * 2 == abs(delta_hex[0]):
         if delta_hex[0] > 1:
             return 60
         return 240
-    if delta_hex[1] % 2 == 0 and abs(delta_hex[0]) % 2 != 0:
-        print("EEE")
+    if delta_hex[1] % 2 == 0 and abs(delta_hex[0]) * 2 == abs(delta_hex[1]):
         if delta_hex[1] > 1:
-            return 330
+            return 300
         return 120
 
 
@@ -160,9 +114,9 @@ def pathfind(path_ref) -> list[movement_node]:  # "pathfinding/paths" is relativ
     for cur_index, cur_node in enumerate(path[:-1]):
         next_node = path[cur_index + 1]
 
-        node_1 = hexToRect(cur_node)
-        node_2 = hexToRect(next_node)
-        rect_difference = (node_2[0] - node_1[0], node_2[1] - node_1[1])
+        # node_1 = hexToRect(cur_node)
+        # node_2 = hexToRect(next_node)
+        # rect_difference = (node_2[0] - node_1[0], node_2[1] - node_1[1])
         hex_difference = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
 
         desired_angle = angle_between_hexes(delta_hex=hex_difference)
