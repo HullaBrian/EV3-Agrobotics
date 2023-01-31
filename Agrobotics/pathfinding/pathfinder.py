@@ -86,22 +86,33 @@ def angle_between_hexes(delta_hex: tuple[int, int]) -> float:
 
 
 def angle_between_hexes(delta_hex):
-    try:
-        q = delta_hex[0]
-        r = delta_hex[1]
-        if abs(delta_hex[0]) == abs(delta_hex[1]):
-            try:
-                q = delta_hex[0] / delta_hex[1]
-                q *= -1 if delta_hex[0] < 1 else 1
-
-                r = delta_hex[1] / delta_hex[0]
-                r *= -1 if delta_hex[1] < 1 else 1
-            except ZeroDivisionError:
-                pass
-        angle = directional_vectors[(q, r)]
-    except KeyError:
-        angle = math.degrees(math.atan2(delta_hex[0], delta_hex[1]))
-    return angle
+    logger.info(f"Checking the angle between hexes, where delta hex is '{delta_hex}'")
+    if delta_hex[0] == 0:
+        if delta_hex[1] > 0:
+            return 300  # -10, 20
+        return 150
+    if delta_hex[1] == 0:
+        if delta_hex[0] > 0:
+            return 30
+        return 210
+    if abs(delta_hex[0]) == abs(delta_hex[1]):
+        if delta_hex[0] == delta_hex[1]:
+            if delta_hex[0] > 0:
+                return 0
+            return 180
+        else:
+            if delta_hex[0] > 0:
+                return 90
+            return 270  # 15, -15
+    if delta_hex[0] % 2 == 0 and abs(delta_hex[1]) % 2 != 0:
+        if delta_hex[0] > 1:
+            return 60
+        return 240
+    if delta_hex[1] % 2 == 0 and abs(delta_hex[0]) % 2 != 0:
+        print("EEE")
+        if delta_hex[1] > 1:
+            return 330
+        return 120
 
 
 def shortest_angle(given_angle: int, desired_angle: int) -> int:
