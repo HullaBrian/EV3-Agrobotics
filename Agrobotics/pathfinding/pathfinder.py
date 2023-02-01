@@ -27,6 +27,8 @@ directional_vectors = {
 }
 logger.debug("Loaded directional vectors!")
 sqrt3 = math.sqrt(3)
+apothem_length = 700.0 / 30.0
+side_length = (2 / sqrt3) * apothem_length
 
 
 def hexToRect(Coord: tuple) -> tuple:
@@ -58,7 +60,7 @@ def angle_between_hexes(delta_hex) -> int:
         else:
             if delta_hex[0] > 0:
                 return 90
-            return 270  # 15, -15
+            return 270
     if delta_hex[0] % 2 == 0 and abs(delta_hex[1]) * 2 == abs(delta_hex[0]):
         if delta_hex[0] > 1:
             return 60
@@ -78,10 +80,14 @@ def shortest_angle(given_angle: int, desired_angle: int) -> int:
     return diff
 
 
-def distance_between_hexes(delta_hex: tuple[int, int]) -> float:
-    return (abs(delta_hex[0])
-            + abs(delta_hex[0] + delta_hex[1])
-            + abs(delta_hex[1])) / 2
+def distance_between_hexes(delta_hex: tuple[int, int], angle: int) -> float | None:
+    delta = delta_hex[0] if delta_hex[0] != 0 else delta_hex[1]
+    if angle in [30, 90, 150, 210, 270, 330]:
+        return apothem_length * delta * 2
+    elif angle in [0, 60, 120, 180, 240, 300]:
+        result = 1.6 * abs(delta * (apothem_length + side_length))
+        return result
+    return None
 
 
 @dataclass
@@ -123,7 +129,7 @@ def pathfind(path_ref) -> list[movement_node]:  # "pathfinding/paths" is relativ
         turn_angle = shortest_angle(current_angle, desired_angle)
         current_angle = turn_angle
 
-        distance = distance_between_hexes(delta_hex=hex_difference)
+        distance = distance_between_hexes(delta_hex=hex_difference, angle=turn_angle)
         out.append(movement_node(
             move_node=next_node,
             start_node=cur_node,

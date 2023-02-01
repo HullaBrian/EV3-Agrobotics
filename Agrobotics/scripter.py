@@ -18,7 +18,7 @@ logger.add(sys.stderr, level="DEBUG")
 
 
 logger.debug("Loading config...")
-config_file = open("pathfinding/config.json", "r")
+config_file = open("config.json", "r")
 config = json.load(config_file)
 config_file.close()
 del config_file

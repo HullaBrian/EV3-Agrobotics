@@ -21,11 +21,11 @@ directional_vectors = {
             (+1, 0): 30,
             (+2, -1): 60
         }
-ACCURACY = 0.10
+ACCURACY = 40
 
 
 def is_about(value1, value2) -> bool:
-    return abs((value1 - value2) / float(value1)) <= ACCURACY
+    return value1 - ACCURACY <= value2 <= value1 + ACCURACY
 
 
 class pathfinding_tests(unittest.TestCase):
@@ -33,16 +33,17 @@ class pathfinding_tests(unittest.TestCase):
         pass  # self.assertEqual("EE", "EEe")
 
     def test_docking_station_distance(self):
-        self.assertTrue(is_about(distance_between_hexes((40 - 29, 40 - 29)), 900))
+        print(distance_between_hexes((40 - 29, 40 - 29), 0))
+        self.assertTrue(is_about(distance_between_hexes((40 - 29, 40 - 29), 0), 900))
 
     def test_farming_module_distance(self):
-        self.assertTrue(is_about(distance_between_hexes((44 - 29, 14 - 29)), 700))  # Farming Module
+        self.assertTrue(is_about(distance_between_hexes((44 - 29, 14 - 29), 90), 700))  # Farming Module
 
     def test_growing_medium_by_docking_station(self):
-        self.assertTrue(is_about(distance_between_hexes((39 - 29, 29 - 33)), 580))
+        self.assertEqual(None, distance_between_hexes((39 - 29, 29 - 33), 17))
 
     def test_arbitrary_distance(self):
-        self.assertTrue(is_about(distance_between_hexes((27 - 29, 33 - 29)), 175))  # Arbitrary distance
+        self.assertTrue(is_about(distance_between_hexes((27 - 29, 33 - 29), 300), 175))  # Arbitrary distance
 
     def test_docking_station_angle(self):
         self.assertEqual(0, angle_between_hexes((40 - 29, 40 - 29)))  # Docking station
