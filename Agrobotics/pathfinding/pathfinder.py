@@ -106,30 +106,36 @@ def pathfind(path_ref) -> list[movement_node]:  # "pathfinding/paths" is relativ
     logger.info("Generating path from path file...")
 
     out: list[movement_node] = []
+    current_angle = None
 
     try:
         with open(path_ref, "r") as path_file:
             path: list[tuple[int, int]] = []
             for line in path_file.readlines():
-                path.append(tuple(int(coord) for coord in line.split(" ")))
+                split = line.split(" ")
+                if len(split) != 1:
+                    path.append(tuple(int(coord) for coord in split))
+                else:
+                    current_angle = int(split[0])
     except FileNotFoundError:
         logger.critical(f"Path file not found! Path: '{path_ref}'")
         return []
 
-    current_angle = 0
+    if current_angle is None:
+        current_angle = 0
     for cur_index, cur_node in enumerate(path[:-1]):
         next_node = path[cur_index + 1]
-
-        # node_1 = hexToRect(cur_node)
-        # node_2 = hexToRect(next_node)
-        # rect_difference = (node_2[0] - node_1[0], node_2[1] - node_1[1])
         hex_difference = (next_node[0] - cur_node[0], next_node[1] - cur_node[1])
 
         desired_angle = angle_between_hexes(delta_hex=hex_difference)
         turn_angle = shortest_angle(current_angle, desired_angle)
         current_angle = turn_angle
 
-        distance = distance_between_hexes(delta_hex=hex_difference, angle=turn_angle)
+        distance = distance_between_hexes(delta_hex=hex_difference, angle=desired_angle)
+        if distance is None:
+            logger.critical(f"[{path_ref}]: PATH NOT VALID FROM '{cur_node}' -> '{next_node}' (Angle: '{desired_angle}') (delta_hex: '{hex_difference}')")
+            raise Exception("PATH IS NOT VALID!")
+
         out.append(movement_node(
             move_node=next_node,
             start_node=cur_node,

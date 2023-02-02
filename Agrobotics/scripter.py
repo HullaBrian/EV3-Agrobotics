@@ -93,7 +93,7 @@ def write_pathfinding(lst: list, file_obj):
     straight_path = []
     try:
         for index, movement in enumerate(lst):
-            movement.distance *= -1 * 13 * 3  # -1 to invert motion and 13 to adjust distance variable to reflect mm's
+            movement.distance *= -1
             if movement.angle != 0:
                 if straight_accumulation != 0:
                     file_obj.write(f"\n# Moving straight from {straight_path[0]} -> {straight_path[-1]}\n")
