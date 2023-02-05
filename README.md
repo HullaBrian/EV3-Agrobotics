@@ -75,10 +75,39 @@
 
 # The Approach
 ## Pathfinding
+### General Approach to Pathfinding
+First, the competition board is divided into small hexagons, to make pathfinding to specific coordinates more precise.
+![See Hex-Mat.jpg](Hex-Mat.jpg)
+This is the general idea behind the program. Based off of the current position of the robot (using the coordinate system), a vector-based pathfinding system is implemented.
+
+![See "Sample hex Grid.png"](assets/Sample_Hex_Grid.png)
+
+Initially, an automatic approach to pathfinding was used, however that proved to be inefficient at choosing paths when compared to a more manual approach. Thus, a hybrid pathfinding script was written, allowing our team to use custom written paths using the coordinate system as described above.
+
+#### Getting Angles
+To attain the necessary angles for the robot to pathfind to, the basic geometry of a hexagon was used. (see the image below for reference)
+![See hexagon-geometry.png](assets/hexagon-geometry.png)
+
+| Vector     | Angle |
+|------------|-------|
+| (r+1, q+1) | 0     |
+| (r+1, q)   | 30    |
+| (r+2, q-1) | 60    |
+| (r+1, q-1) | 90    |
+| (r+1, q-2) | 120   |
+| (r, q-1)   | 150   |
+| (r-1, q-1) | 180   |
+| (r-1, q)   | 210   |
+| (r-2, q+1) | 240   |
+| (r-1, q+1) | 270   |
+| (r-1, q+2) | 300   |
+| (r, q+1)   | 330   |
+
+
 ### Getting to the Challenge
 - The robot uses a hybrid pathfinding program. In other words, the coordinates of the tiles of the path must be given to the robot, but the program's algorithm decides the angle and distance to go.
 ## Completing the Challenge
-- Once the hybrid pathfinding is complete, the robot executes a set of pre-defined instructions for the challenge
+- Once the hybrid pathfinding is complete, the robot executes a set of pre-defined instructions for the challenge.
 
 
 
