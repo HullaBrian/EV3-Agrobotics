@@ -103,7 +103,8 @@ def write_pathfinding(lst: list, file_obj):
 
                 file_obj.write(f"\n# Moving to {str(movement.move_node)}\n")
                 file_obj.write(f"robot.turn({movement.angle})\ntime.sleep(0.5)\n")
-                file_obj.write(f"robot.straight({round(movement.distance)})\n")
+                if round(movement.distance) != 0:
+                    file_obj.write(f"robot.straight({round(movement.distance)})\n")
             else:
                 straight_accumulation += round(movement.distance)
                 straight_path.append(str(movement.move_node))
