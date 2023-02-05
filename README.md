@@ -86,6 +86,7 @@ Initially, an automatic approach to pathfinding was used, however that proved to
 
 #### Getting Angles
 To attain the necessary angles for the robot to pathfind to, the basic geometry of a hexagon was used. (see the image below for reference)
+
 ![See hexagon-geometry.png](assets/hexagon-geometry.png)
 
 | Vector     | Angle |
