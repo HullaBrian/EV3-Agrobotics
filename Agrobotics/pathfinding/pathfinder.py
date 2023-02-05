@@ -155,7 +155,6 @@ def pathfind(path_ref) -> list[
             continue
 
         desired_angle = angle_between_hexes(delta_hex=hex_difference)
-        logger.critical(f"{current_angle}, {desired_angle}, {hex_difference}")
         turn_angle = shortest_angle(current_angle, desired_angle)
         current_angle = turn_angle
 
