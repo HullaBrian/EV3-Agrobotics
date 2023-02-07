@@ -5,6 +5,7 @@
 ## Programing
 ### Robot driving/settings:
 - Forwards: ```robot.straight(*distance in mm*)```
+- Turn: ```robot.turn(angle_in_degrees)```
 - Changing robot DriveBase settings:
   - ```robot.settings(straight_speed, straight_acceleration, turn_rate, turn_acceleration)```
     - ``straight_speed`` is in mm/s
