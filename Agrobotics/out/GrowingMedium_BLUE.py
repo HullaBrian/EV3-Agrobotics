@@ -15,8 +15,13 @@ ev3 = EV3Brick()
 
 left_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
 right_motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
-robo_gun = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
+try:
+    robo_gun = Motor(Port.C, positive_direction=Direction.CLOCKWISE)
+except Exception:
+    print("robo gun error!")
+    robo_gun = None
 robot = DriveBase(left_motor, right_motor, wheel_diameter=83, axle_track=100)
+robot.settings(straight_speed=300)
 
 
 def run_robo_gun(speed: int, rotations: int):

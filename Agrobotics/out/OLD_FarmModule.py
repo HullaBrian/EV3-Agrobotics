@@ -21,7 +21,6 @@ except Exception:
     print("robo gun error!")
     robo_gun = None
 robot = DriveBase(left_motor, right_motor, wheel_diameter=83, axle_track=100)
-robot.settings(straight_speed=300)
 
 
 def run_robo_gun(speed: int, rotations: int):
@@ -31,13 +30,6 @@ def run_robo_gun(speed: int, rotations: int):
 
 
 # ----PATHFINDING---- #
-
-# Moving straight from (29, 33) -> (29, 33)
-robot.straight(-186)
-
-# Moving to (16, 46)
-robot.turn(-90)
-time.sleep(0.5)
-robot.straight(606)
+robot.straight(-653 - 130)
 
 # ----INSTRUCTIONS---- #
