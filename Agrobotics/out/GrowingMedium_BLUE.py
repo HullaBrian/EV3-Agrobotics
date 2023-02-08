@@ -27,9 +27,14 @@ def run_robo_gun(speed: int, rotations: int):
 
 # ----PATHFINDING---- #
 
-# Moving to (37, 31)
-robot.turn(-30)
+# Moving to (39, 29)
+robot.turn(30)
 time.sleep(0.5)
-robot.straight(-160)
+robot.straight(-466)
+
+# Moving to (43, 25)
+robot.turn(60)
+time.sleep(0.5)
+robot.straight(-186)
 
 # ----INSTRUCTIONS---- #
