@@ -35,10 +35,10 @@ def run_robo_gun(speed: int, rotations: int):
 # Moving to (39, 29)
 robot.turn(30)
 time.sleep(0.5)
-robot.straight(-450)
+robot.straight(-466)
 
 # Moving to (43, 25)
-robot.turn(55)
+robot.turn(60)
 time.sleep(0.5)
 robot.straight(-186)
 

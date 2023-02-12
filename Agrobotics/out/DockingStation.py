@@ -31,8 +31,6 @@ def run_robo_gun(speed: int, rotations: int):
 
 
 # ----PATHFINDING---- #
-robot.straight(-884)
 
 # ----INSTRUCTIONS---- #
-# Test line
 run_robo_gun(200, 2)

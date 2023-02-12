@@ -41,3 +41,4 @@ time.sleep(0.5)
 robot.straight(-321)
 
 # ----INSTRUCTIONS---- #
+run_robo_gun(200, 3)
