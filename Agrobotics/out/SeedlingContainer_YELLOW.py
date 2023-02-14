@@ -30,6 +30,13 @@ def run_robo_gun(speed: int, rotations: int):
         speed *= -1
 
 
+touch_sensor = TouchSensor(Port.S4)
+touch_sensor2 = TouchSensor(Port.S1)
+while not touch_sensor.pressed() and not touch_sensor2.pressed():
+    pass
+time.sleep(0.5)
+
+
 # ----PATHFINDING---- #
 
 # Moving straight from (42, 16) -> (42, 16)
@@ -55,4 +62,4 @@ robot.turn(-90)
 time.sleep(0.5)
 
 # ----INSTRUCTIONS---- #
-run_robo_gun(200, 3)
+run_robo_gun(200, 1)

@@ -2,6 +2,8 @@
   "right wheel": "D",
   "left wheel": "A",
   "robo gun": "C",
+  "Touch Sensor": "4",
+  "Touch Sensor 2": "1",
   "wheel diameter": 83,
   "axle track": 100
 }

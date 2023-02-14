@@ -1,0 +1,1 @@
+robot.straight(10)  # Go background

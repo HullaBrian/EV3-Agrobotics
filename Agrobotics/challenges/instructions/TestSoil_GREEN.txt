@@ -1,1 +1,1 @@
-run_robo_gun(200, 3)
+run_robo_gun(200, 1)

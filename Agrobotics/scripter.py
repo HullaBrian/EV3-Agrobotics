@@ -54,6 +54,13 @@ def run_robo_gun(speed: int, rotations: int):
     for i in range(rotations):
         robo_gun.run_until_stalled(speed, duty_limit=80)
         speed *= -1
+
+
+touch_sensor = TouchSensor(Port.S{config["Touch Sensor"]})
+touch_sensor2 = TouchSensor(Port.S{config["Touch Sensor 2"]})
+while not touch_sensor.pressed() and not touch_sensor2.pressed():
+    pass
+time.sleep(0.5)
 """
 logger.success("Applied config!")
 
