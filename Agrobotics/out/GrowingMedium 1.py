@@ -48,3 +48,4 @@ time.sleep(0.5)
 robot.straight(-1287)
 
 # ----INSTRUCTIONS---- #
+robot.straight(100)  # Go backwards

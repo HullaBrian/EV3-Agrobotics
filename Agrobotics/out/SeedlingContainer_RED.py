@@ -50,4 +50,4 @@ robot.straight(-345)
 # ----INSTRUCTIONS---- #
 run_robo_gun(200, 1)
 
-robot.straight(15)
+robot.straight(100)  # Go backwards

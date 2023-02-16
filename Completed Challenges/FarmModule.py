@@ -41,4 +41,4 @@ time.sleep(0.5)
 robot.straight(-660)
 
 # ----INSTRUCTIONS---- #
-robot.straight(100)  # Go background
+robot.straight(100)  # Go backwards

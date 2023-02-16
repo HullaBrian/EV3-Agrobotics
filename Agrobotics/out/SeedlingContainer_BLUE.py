@@ -52,4 +52,5 @@ run_robo_gun(200, 1)
 
 robot.straight(-50)
 time.sleep(0.5)
-robot.straight(100)
+
+robot.straight(100)  # Go backwards

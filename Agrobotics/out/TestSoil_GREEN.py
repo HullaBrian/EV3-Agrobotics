@@ -45,7 +45,9 @@ robot.straight(-186)
 # Moving to (16, 46)
 robot.turn(-90)
 time.sleep(0.5)
-robot.straight(606)
+robot.straight(-606)
 
 # ----INSTRUCTIONS---- #
 run_robo_gun(200, 1)
+
+robot.straight(100)  # Go backwards

@@ -142,6 +142,7 @@ for file_name in paths_dict:
         path_file.write("\n# ----INSTRUCTIONS---- #\n")
         logger.debug("Wrote pathfinding")
         write_instructions(file_name.split(os.sep)[-1], path_file)
+        path_file.write("\n\nrobot.straight(100)  # Go backwards")
         logger.debug("Wrote instructions")
     logger.success(f"Wrote instructions for '{file_name}'")
 logger.success("Successfully wrote all instructions to out files!")
